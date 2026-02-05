@@ -1,0 +1,36 @@
+{
+	"BUILD_DIR" : "C:/Users/MSI/Downloads/sans_titre2/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/sans_titre2_autogen",
+	"CMAKE_BINARY_DIR" : "C:/Users/MSI/Downloads/sans_titre2/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/MSI/Downloads/sans_titre2/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/Users/MSI/Downloads/sans_titre2",
+	"CMAKE_SOURCE_DIR" : "C:/Users/MSI/Downloads/sans_titre2",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Ninja",
+	"INCLUDE_DIR" : "C:/Users/MSI/Downloads/sans_titre2/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/sans_titre2_autogen/include",
+	"INPUTS" : 
+	[
+		"C:/Users/MSI/Downloads/sans_titre2/images/update_clicked.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/delete.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/employe_icon.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/update.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/delete_hover.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/poubelle_icon.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/logo.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/zone_icon.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/delete_clicked.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/truck_icon.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/mission_logo.png",
+		"C:/Users/MSI/Downloads/sans_titre2/images/update_hover.png"
+	],
+	"LOCK_FILE" : "C:/Users/MSI/Downloads/sans_titre2/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/sans_titre2_autogen.dir/AutoRcc_resources_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "--no-zstd", "-name", "resources" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_resources.cpp",
+	"RCC_EXECUTABLE" : "C:/Qt/6.7.3/mingw_64/bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "C:/Users/MSI/Downloads/sans_titre2/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/sans_titre2_autogen.dir/AutoRcc_resources_EWIEGA46WW_Used.txt",
+	"SOURCE" : "C:/Users/MSI/Downloads/sans_titre2/resources.qrc",
+	"USE_BETTER_GRAPH" : false,
+	"VERBOSITY" : 0
+}

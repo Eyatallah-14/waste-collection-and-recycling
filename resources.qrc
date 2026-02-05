@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/logo.png</file>
+        <file>images/mission_logo.png</file>
+        <file>images/delete.png</file>
+        <file>images/delete_hover.png</file>
+        <file>images/update.png</file>
+        <file>images/update_hover.png</file>
+        <file>images/zone_icon.png</file>
+        <file>images/poubelle_icon.png</file>
+        <file>images/employe_icon.png</file>
+        <file>images/truck_icon.png</file>
+        <file>images/delete_clicked.png</file>
+        <file>images/update_clicked.png</file>
+    </qresource>
+</RCC>
