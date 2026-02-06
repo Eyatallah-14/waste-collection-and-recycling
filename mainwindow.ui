@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1600</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1600</width>
+    <height>900</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow {
+    background-color: #fcf7f3;
+}
+
+QWidget#centralwidget {
+    border: 3px solid #8e944e;
+    border-radius: 10px;
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="logo">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>10</y>
+      <width>241</width>
+      <height>221</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: transparent;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>-130</y>
+      <width>4</width>
+      <height>951</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: #8f954f;
+    min-width: 2px;
+    max-width: 2px;</string>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Orientation::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>640</y>
+      <width>84</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: #8e944e;
+    border: 2px solid black;
+    border-radius: 30px;
+    color: white;
+    font-size: 24pt;
+    font-weight: bold;
+    min-width: 80px;
+    min-height: 50px;
+    text-align: center;
+    padding: 0px;
+}
+
+QPushButton:hover {
+    background-color: #6d7339;
+    color: white;
+}
+
+QPushButton:pressed {
+    background-color: #6d7339;
+}</string>
+    </property>
+    <property name="text">
+     <string>&lt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_5">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>380</y>
+      <width>211</width>
+      <height>74</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    color: #8e944e;
+    font-size: 12pt;
+    text-align: center;
+    padding: 15px 20px;
+    min-height: 40px;
+}
+
+QPushButton:hover {
+    background-color: green;
+    color: white;
+}
+
+QPushButton:pressed {
+    background-color: #6d7389;
+}</string>
+    </property>
+    <property name="text">
+     <string>Zone</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_6">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>300</y>
+      <width>211</width>
+      <height>74</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    color: #8e944e;
+    font-size: 12pt;
+    text-align: center;
+    padding: 15px 20px;
+    min-height: 40px;
+}
+
+QPushButton:hover {
+    background-color: green;
+    color: white;
+}
+
+QPushButton:pressed {
+    background-color: #6d7389;
+}</string>
+    </property>
+    <property name="text">
+     <string>Poubelle</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_8">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>540</y>
+      <width>211</width>
+      <height>74</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    color: #8e944e;
+    font-size: 12pt;
+    text-align: center;
+    padding: 15px 20px;
+    min-height: 40px;
+}
+
+QPushButton:hover {
+    background-color: green;
+    color: white;
+}
+
+QPushButton:pressed {
+    background-color: #6d7389;
+}</string>
+    </property>
+    <property name="text">
+     <string>Missions</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>190</y>
+      <width>1150</width>
+      <height>600</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QTableWidget {
+    background-color: #FFFFFF;
+    alternate-background-color: #F5F5F5;
+    border: 3px solid #8e944e;
+    gridline-color: #8e944e;
+    color: #8e944e;
+    font-size: 12pt;
+    selection-background-color: rgba(142, 148, 78, 0.3);
+}
+
+/* Style the viewport (the actual scrollable area) */
+QTableWidget::viewport {
+    background-color: #FFFFFF;
+    border: none;
+}
+
+/* Ensure the corner widget doesn't interfere */
+QTableWidget QTableCornerButton::section {
+    background-color: #FFFFFF;
+    border: none;
+    border-bottom: 2px solid #8e944e;
+    border-right: 1px solid #8e944e;
+}
+
+QTableWidget::item {
+    padding: 10px;
+    color: #8e944e;
+    border-right: 1px solid #8e944e;
+    border-bottom: 1px solid #8e944e;
+    background-color: #FFFFFF;
+}
+
+QHeaderView::section {
+    background-color: #FFFFFF;
+    color: #8e944e;
+    font-size: 13pt;
+    font-weight: bold;
+    border: none;
+    border-bottom: 3px solid #8e944e;
+    border-right: 1px solid #8e944e;
+    padding: 15px;
+}
+
+/* Remove border from last header section */
+QHeaderView::section:last {
+    border-right: none;
+}
+
+QTableWidget::item:selected {
+    background-color: rgba(142, 148, 78, 0.2);
+}
+
+/* Show gridlines properly */
+QTableWidget {
+    showGrid: true;
+}</string>
+    </property>
+    <property name="dragEnabled">
+     <bool>false</bool>
+    </property>
+    <property name="alternatingRowColors">
+     <bool>false</bool>
+    </property>
+    <attribute name="horizontalHeaderCascadingSectionResizes">
+     <bool>false</bool>
+    </attribute>
+    <column>
+     <property name="text">
+      <string>Mission number</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>zone</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>workers invoved</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Starting time</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Ending time</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Operations</string>
+     </property>
+    </column>
+   </widget>
+   <widget class="QTableWidget" name="tableWidgetEmploye">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>190</y>
+      <width>1150</width>
+      <height>600</height>
+     </rect>
+    </property>
+    <property name="visible">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QTableWidget {
+    background-color: #FFFFFF;
+    alternate-background-color: #F5F5F5;
+    border: 3px solid #8e944e;
+    gridline-color: #8e944e;
+    color: #8e944e;
+    font-size: 12pt;
+}
+
+QTableWidget::viewport {
+    background-color: #FFFFFF;
+    border: none;
+}
+
+QTableWidget::item {
+    padding: 10px;
+    color: #8e944e;
+    border-right: 1px solid #8e944e;
+    border-bottom: 1px solid #8e944e;
+    background-color: #FFFFFF;
+}
+
+QHeaderView::section {
+    background-color: #FFFFFF;
+    color: #8e944e;
+    font-size: 13pt;
+    font-weight: bold;
+    border: none;
+    border-bottom: 3px solid #8e944e;
+    border-right: 1px solid #8e944e;
+    padding: 15px;
+}
+
+QTableWidget::item:selected {
+    background-color: rgba(142, 148, 78, 0.2);
+}
+
+QTableWidget {
+    showGrid: true;
+}</string>
+    </property>
+    <attribute name="horizontalHeaderCascadingSectionResizes">
+     <bool>false</bool>
+    </attribute>
+    <column>
+     <property name="text">
+      <string>id_employe</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>nom</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>prenom</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>mot_de_passe</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>telephone</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>salaire</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>etat</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Operations</string>
+     </property>
+    </column>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>180</y>
+      <width>881</width>
+      <height>471</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"> background-color: #8e944e;
+
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>100</y>
+      <width>301</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: #8e944e;
+    border: 2px solid black;
+    border-radius: 30px;
+    color: white;
+    font-size: 15pt;
+    font-weight: bold;
+    min-width: 80px;
+    min-height: 50px;
+    text-align: center;
+    padding: 0px;
+}
+
+QPushButton:hover {
+    background-color: green;
+    color: white;
+}
+
+QPushButton:pressed {
+    background-color: #6d7339;
+}</string>
+    </property>
+    <property name="text">
+     <string>Launch a new mission</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="missions_icon">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>560</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel{background-color: transparent;}
+QLabel:hover {
+    background-color: green;
+    color: white;
+}
+
+QLabel:pressed {
+    background-color: #6d7389;
+}
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>images/mission_logo.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="zone_icon">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>400</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel{background-color: transparent;}
+QLabel:hover {
+    background-color: green;
+    color: white;
+}
+
+QLabel:pressed {
+    background-color: #6d7389;
+}
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>images/zone.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="poubelle_icon">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>310</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel{background-color: transparent;}
+QLabel:hover {
+    background-color: green;
+    color: white;
+}
+
+QLabel:pressed {
+    background-color: #6d7389;
+}
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>images/poubelle.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_9">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>460</y>
+      <width>211</width>
+      <height>74</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    color: #8e944e;
+    font-size: 12pt;
+    text-align: center;
+    padding: 15px 20px;
+    min-height: 40px;
+}
+
+QPushButton:hover {
+    background-color: green;
+    color: white;
+}
+
+QPushButton:pressed {
+    background-color: #6d7389;
+}</string>
+    </property>
+    <property name="text">
+     <string>Véhicule</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="vehicule_icon">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>480</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel{background-color: transparent;}
+QLabel:hover {
+    background-color: green;
+    color: white;
+}
+
+QLabel:pressed {
+    background-color: #6d7389;
+}
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>images/truck.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="employe_icon">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>240</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel{background-color: transparent;}
+QLabel:hover {
+    background-color: green;
+    color: white;
+}
+
+QLabel:pressed {
+    background-color: #6d7389;
+}
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>images/employe.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_7">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>220</y>
+      <width>211</width>
+      <height>74</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    color: #8e944e;
+    font-size: 12pt;
+    text-align: center;
+    padding: 15px 20px;
+    min-height: 40px;
+}
+
+QPushButton:hover {
+    background-color: green;
+    color: white;
+}
+
+QPushButton:pressed {
+    background-color: #6d7389;
+}</string>
+    </property>
+    <property name="text">
+     <string>Employé</string>
+    </property>
+   </widget>
+   <zorder>pushButton_7</zorder>
+   <zorder>label</zorder>
+   <zorder>logo</zorder>
+   <zorder>line</zorder>
+   <zorder>pushButton</zorder>
+   <zorder>pushButton_5</zorder>
+   <zorder>pushButton_6</zorder>
+   <zorder>pushButton_8</zorder>
+   <zorder>tableWidget</zorder>
+   <zorder>pushButton_2</zorder>
+   <zorder>missions_icon</zorder>
+   <zorder>zone_icon</zorder>
+   <zorder>poubelle_icon</zorder>
+   <zorder>pushButton_9</zorder>
+   <zorder>vehicule_icon</zorder>
+   <zorder>employe_icon</zorder>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1303</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
