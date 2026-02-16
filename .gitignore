@@ -1,0 +1,11 @@
+# Ignore Qt build folders and cache
+build/
+*.user
+*.pro.user
+*.qtc_clangd/
+*.o
+*.exe
+*.obj
+*.moc
+*.rcc
+*.ui
