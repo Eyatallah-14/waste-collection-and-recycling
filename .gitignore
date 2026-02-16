@@ -1,11 +1,37 @@
-# Ignore Qt build folders and cache
+﻿# === Qt Creator / CMake / Qt build files ===
+
+# Build directories
 build/
-*.user
-*.pro.user
-*.qtc_clangd/
+bin/
+lib/
 *.o
-*.exe
 *.obj
+*.a
+*.so
+*.dll
+*.exe
+
+# Qt Creator user/project settings
+*.user
+*.user.*.prefs
+*.pro.user
+*.pro.user.*.prefs
+*.qbs.user
+*.qmlproject.user
+
+# MOC / UIC / RCC generated files
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
 *.moc
-*.rcc
-*.ui
+*.moc.h
+
+# Clangd / Code completion cache
+.qtc_clangd/
+*.idx
+
+# Other temporary files
+*.log
+*.tmp
+*.swp
+*.DS_Store
