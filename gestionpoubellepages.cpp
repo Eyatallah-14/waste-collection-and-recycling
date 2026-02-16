@@ -37,10 +37,12 @@ GestionPoubellePage::GestionPoubellePage(QWidget *parent)
         "QWidget#GestionPoubellePage { background-color: #F0F3F5; }"
         "QWidget#topButtonBar, QWidget#searchBar { background-color: transparent; }"
         "QPushButton#btnListPoubelles, QPushButton#btnAddPoubelle, QPushButton#btnStatistics, QPushButton#btnHistorique { min-height: 45px; }"
-        "QPushButton#btnSearch, QPushButton#btnTri, QPushButton#btnExportPdf { background-color: #8e944e; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 10pt; font-weight: bold; }"
-        "QPushButton#btnSearch:hover, QPushButton#btnTri:hover, QPushButton#btnExportPdf:hover { background-color: #6d7339; }"
+        "QPushButton#btnSearch, QPushButton#btnTriEtat, QPushButton#btnTriType, QPushButton#btnExportPdf, QPushButton#btnExportCsv { background-color: #8e944e; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 10pt; font-weight: bold; }"
+        "QPushButton#btnSearch:hover, QPushButton#btnTriEtat:hover, QPushButton#btnTriType:hover, QPushButton#btnExportPdf:hover, QPushButton#btnExportCsv:hover { background-color: #6d7339; }"
         "QPushButton#btnConfirmAdd, QPushButton#btnConfirmUpdate { background-color: #8e944e; color: white; border: none; border-radius: 10px; padding: 12px 30px; font-size: 11pt; font-weight: bold; }"
         "QPushButton#btnConfirmAdd:hover, QPushButton#btnConfirmUpdate:hover { background-color: #6d7339; }"
+        "QPushButton#btnUploadImage { background-color: #05668D; color: white; border: none; border-radius: 10px; padding: 12px 16px; font-size: 10pt; font-weight: bold; }"
+        "QPushButton#btnUploadImage:hover { background-color: #044a5e; }"
         "QLineEdit, QComboBox, QSpinBox, QDateEdit { border: 2px solid #E0E0E0; border-radius: 8px; padding: 8px 12px; background-color: white; color: #2C3E50; }"
         "QLineEdit::placeholder { color: #7B8794; }"
         "QComboBox QAbstractItemView { background-color: white; color: #2C3E50; selection-background-color: rgba(142, 148, 78, 0.25); selection-color: #2C3E50; outline: none; }"
@@ -86,8 +88,19 @@ GestionPoubellePage::GestionPoubellePage(QWidget *parent)
     if (ui->btnExportPdf) {
         ui->btnExportPdf->setToolTip("Exporter la liste des poubelles en PDF");
     }
-    if (ui->btnTri) {
-        ui->btnTri->setToolTip("Trier les poubelles");
+    if (ui->btnExportCsv) {
+        ui->btnExportCsv->setToolTip("Exporter la liste des poubelles en CSV");
+    }
+    if (ui->btnTriEtat) {
+        ui->btnTriEtat->setToolTip("Trier par état");
+    }
+    if (ui->btnTriType) {
+        ui->btnTriType->setToolTip("Trier par type de déchet");
+    }
+    if (ui->btnUploadImage) {
+        ui->btnUploadImage->setToolTip("Ajouter une photo de la poubelle");
+        ui->btnUploadImage->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        ui->btnUploadImage->setFixedHeight(44);
     }
     if (ui->inputNotes) {
         ui->inputNotes->setToolTip("Ajouter des notes supplémentaires");
@@ -133,8 +146,11 @@ GestionPoubellePage::GestionPoubellePage(QWidget *parent)
     connect(ui->btnConfirmAdd, &QPushButton::clicked, this, &GestionPoubellePage::ajouterPoubelle);
     connect(ui->btnConfirmUpdate, &QPushButton::clicked, this, &GestionPoubellePage::modifierPoubelle);
     connect(ui->btnSearch, &QPushButton::clicked, this, &GestionPoubellePage::rechercherPoubelle);
-    connect(ui->btnTri, &QPushButton::clicked, this, &GestionPoubellePage::trierPoubelles);
+    connect(ui->btnTriEtat, &QPushButton::clicked, this, &GestionPoubellePage::trierParEtat);
+    connect(ui->btnTriType, &QPushButton::clicked, this, &GestionPoubellePage::trierParType);
     connect(ui->btnExportPdf, &QPushButton::clicked, this, &GestionPoubellePage::exporterPDF);
+    connect(ui->btnExportCsv, &QPushButton::clicked, this, &GestionPoubellePage::exporterCSV);
+    connect(ui->btnUploadImage, &QPushButton::clicked, this, &GestionPoubellePage::uploadImage);
 
     // Ajouter quelques données de démonstration
     Poubelle p1 = {1, "Plastique", "Bon", 45, "Zone A - Rue 12", "2024-01-15", "2026-02-05", false, "Nouvelle installation"};
@@ -388,43 +404,35 @@ void GestionPoubellePage::rechercherPoubelle()
     }
 }
 
-void GestionPoubellePage::trierPoubelles()
+void GestionPoubellePage::trierParEtat()
 {
-    // Afficher un menu pour choisir le type de tri
-    QStringList options;
-    options << "Trier par État" << "Trier par Type de Déchet" << "Trier par ID";
-    
-    bool ok;
-    QString choix = QInputDialog::getItem(this, "Choisir le tri", 
-                                          "Sélectionnez le critère de tri:", 
-                                          options, 0, false, &ok);
-    
-    if (!ok || choix.isEmpty()) {
-        return;
-    }
-    
     // Créer une liste triée
     QList<Poubelle> liste;
     for (auto it = poubelles.begin(); it != poubelles.end(); ++it) {
         liste.append(it.value());
     }
-    
-    // Trier selon le choix
-    if (choix == "Trier par État") {
-        std::sort(liste.begin(), liste.end(), [](const Poubelle &a, const Poubelle &b) {
-            return a.etat < b.etat;
-        });
-    } else if (choix == "Trier par Type de Déchet") {
-        std::sort(liste.begin(), liste.end(), [](const Poubelle &a, const Poubelle &b) {
-            return a.type_dechet < b.type_dechet;
-        });
-    } else if (choix == "Trier par ID") {
-        std::sort(liste.begin(), liste.end(), [](const Poubelle &a, const Poubelle &b) {
-            return a.id < b.id;
-        });
+
+    std::sort(liste.begin(), liste.end(), [](const Poubelle &a, const Poubelle &b) {
+        return a.etat < b.etat;
+    });
+
+    ui->poubelleTable->setRowCount(0);
+    for (int i = 0; i < liste.size(); ++i) {
+        ajouterLigneTable(liste[i], i);
     }
-    
-    // Rafraîchir la table
+}
+
+void GestionPoubellePage::trierParType()
+{
+    QList<Poubelle> liste;
+    for (auto it = poubelles.begin(); it != poubelles.end(); ++it) {
+        liste.append(it.value());
+    }
+
+    std::sort(liste.begin(), liste.end(), [](const Poubelle &a, const Poubelle &b) {
+        return a.type_dechet < b.type_dechet;
+    });
+
     ui->poubelleTable->setRowCount(0);
     for (int i = 0; i < liste.size(); ++i) {
         ajouterLigneTable(liste[i], i);
@@ -506,6 +514,46 @@ void GestionPoubellePage::exporterPDF()
     QMessageBox::information(this, "Succès", "PDF exporté avec succès !");
 }
 
+void GestionPoubellePage::exporterCSV()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, "Exporter en CSV", "", "CSV Files (*.csv)");
+    
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Erreur", "Impossible de créer le fichier CSV");
+        return;
+    }
+
+    QTextStream out(&file);
+    
+    // En-tête
+    out << "ID,Type Déchet,État,Taux Remplissage (%),Localisation,Date Installation,Dernière Collecte,Endommagée,Notes\n";
+
+    // Données
+    for (auto it = poubelles.begin(); it != poubelles.end(); ++it) {
+        const Poubelle &p = it.value();
+        QString escapedNotes = p.notes;
+        escapedNotes.replace("\"", "\"\"");
+        
+        out << p.id << ","
+            << p.type_dechet << ","
+            << p.etat << ","
+            << p.taux_remplissage << ","
+            << p.localisation << ","
+            << p.date_installation << ","
+            << p.derniere_collecte << ","
+            << (p.endommagee ? "Oui" : "Non") << ","
+            << "\"" << escapedNotes << "\"\n";
+    }
+
+    file.close();
+    QMessageBox::information(this, "Succès", "CSV exporté avec succès !");
+}
+
 void GestionPoubellePage::afficherNotification()
 {
     // Cette fonction sera appelée pour afficher les notifications
@@ -525,6 +573,16 @@ void GestionPoubellePage::chargerHistorique()
     }
 }
 
+void GestionPoubellePage::uploadImage()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, "Sélectionner une image", "",
+                                                     "Images (*.png *.jpg *.jpeg *.bmp)");
+    
+    if (!fileName.isEmpty()) {
+        QMessageBox::information(this, "Image", "Image chargée: " + fileName);
+        // Ici, vous pourriez afficher l'image dans un QLabel
+    }
+}
 
 void GestionPoubellePage::setupPoubelleTable()
 {

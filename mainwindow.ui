@@ -1582,24 +1582,56 @@ QPushButton:pressed {
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>110</y>
+       <y>230</y>
        <width>1090</width>
-       <height>620</height>
+       <height>300</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: #8e944e; border-radius: 10px;</string>
+      <string notr="true">background-color: #d3d3d3; border-radius: 10px;</string>
      </property>
      <property name="text">
       <string/>
      </property>
     </widget>
-    
+    <widget class="QLabel" name="lblMissionsTitle">
+ <property name="geometry">
+  <rect>
+   <x>100</x>
+   <y>20</y>
+   <width>500</width>
+   <height>60</height>
+  </rect>
+ </property>
+ <property name="styleSheet">
+  <string notr="true">font-size: 28pt; font-weight: bold; color: #8e944e; background: transparent;</string>
+ </property>
+ <property name="text">
+  <string>Gestion des Missions</string>
+ </property>
+</widget>
+
+<widget class="QLabel" name="missionsIconBig">
+ <property name="geometry">
+  <rect>
+   <x>20</x>
+   <y>10</y>
+   <width>80</width>
+   <height>80</height>
+  </rect>
+ </property>
+ <property name="pixmap">
+  <pixmap resource="">:/images/mission_logo.png</pixmap>  <!-- or mission_logo_big if you have a larger one -->
+ </property>
+ <property name="scaledContents">
+  <bool>true</bool>
+ </property>
+</widget>
     <widget class="QPushButton" name="btnAddMission">
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>30</y>
+       <y>165</y>
        <width>220</width>
        <height>55</height>
       </rect>
@@ -1624,14 +1656,227 @@ QPushButton:pressed {
       <string>Ajouter Mission</string>
      </property>
     </widget>
-    
+    <widget class="QLabel" name="lblSearchMission">
+ <property name="geometry">
+  <rect>
+   <x>50</x>
+   <y>80</y>
+   <width>120</width>
+   <height>30</height>
+  </rect>
+ </property>
+</widget>
+
+<widget class="QLineEdit" name="lineSearchMission">
+ <property name="geometry">
+  <rect>
+   <x>550</x>
+   <y>30</y>
+   <width>400</width>
+   <height>40</height>
+  </rect>
+ </property>
+ <property name="placeholderText">
+  <string>Zone, employés, date...</string>
+ </property>
+ <property name="styleSheet">
+  <string notr="true">color:black;background: white; border: 2px solid #8e944e; border-radius: 8px; padding: 5px; font-size: 12pt;</string>
+ </property>
+</widget>
+
+<widget class="QPushButton" name="btnSearchMission">
+ <property name="geometry">
+  <rect>
+   <x>1000</x>
+   <y>30</y>
+   <width>120</width>
+   <height>40</height>
+  </rect>
+ </property>
+ <property name="text">
+  <string>Rechercher</string>
+ </property>
+ <property name="styleSheet">
+  <string notr="true">QPushButton { color: #000000; background-color: #8e944e;  border-radius: 8px; } QPushButton:hover { background-color: #6d7339; }</string>
+ </property>
+</widget>
+<!-- Checkbox Sort by name -->
+<widget class="QCheckBox" name="checkSortByZone">
+ <property name="geometry">
+  <rect>
+   <x>50</x>
+   <y>130</y>   <!-- adjust y so it doesn't overlap search -->
+   <width>200</width>
+   <height>30</height>
+  </rect>
+ </property>
+ <property name="text">
+  <string>Trier par nom de zone</string>
+ </property>
+ <property name="styleSheet">
+  <string notr="true">font-size: 13pt; color: #000000;</string>
+ </property>
+</widget>
+
+<!-- Combo for filter/group by status -->
+<widget class="QComboBox" name="comboGroupStatus">
+ <property name="geometry">
+  <rect>
+   <x>550</x>
+   <y>130</y>
+   <width>250</width>
+   <height>40</height>
+  </rect>
+ </property>
+ <property name="styleSheet">
+  <string notr="true">font-size: 12pt; ; color: #000000;border: 2px solid #8e944e; border-radius: 8px;</string>
+ </property>
+</widget>
+
+<!-- Apply button -->
+<widget class="QPushButton" name="btnApplySortGroup">
+ <property name="geometry">
+  <rect>
+   <x>1000</x>
+   <y>130</y>
+   <width>140</width>
+   <height>40</height>
+  </rect>
+ </property>
+ <property name="text">
+  <string>Appliquer</string>
+ </property>
+ <property name="styleSheet">
+  <string notr="true">QPushButton { background-color: #8e944e; color: #000000; border-radius: 8px; font-size: 13pt; } QPushButton:hover { background-color: #6d7339; }</string>
+ </property>
+</widget>
+   <!-- Stats Container  -->
+<widget class="QWidget" name="statsContainer">
+ <property name="geometry">
+  <rect>
+   <x>70</x>
+   <y>560</y>    
+   <width>840</width>
+   <height>250</height>
+  </rect>
+ </property>
+ <property name="styleSheet">
+  <string notr="true">
+   background: rgba(30, 79, 44, 0.82);
+   border-radius: 16px;
+   border: 1px solid rgba(100, 180, 255, 0.4);
+   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  </string>
+ </property>
+
+ <!-- Title -->
+ <widget class="QLabel" name="lblStatsTitle">
+  <property name="geometry">
+   <rect>
+    <x>30</x>
+    <y>15</y>
+    <width>450</width>
+    <height>35</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">color: #c0e0ff; font-size: 18pt; font-weight: bold; background: transparent;</string>
+  </property>
+  <property name="text">
+   <string>Mission Statistics</string>
+  </property>
+ </widget>
+
+ <!-- Stat cards  -->
+ <widget class="QLabel" name="lblTotalMissions">
+  <property name="geometry">
+   <rect>
+    <x>35</x>    
+    <y>65</y>
+    <width>290</width>
+    <height>42</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    color: #ffffff; 
+    font-size: 14pt; 
+    font-weight: bold; 
+    background: rgba(60, 60, 100, 0.6);
+    border-radius: 10px;
+    padding: 0 14px;
+    border: none;
+   </string>
+  </property>
+  <property name="text">
+   <string>Total Missions: 12</string>   <!-- ← changed to non-zero for testing -->
+  </property>
+  <property name="alignment">
+   <set>Qt::AlignLeft|Qt::AlignVCenter</set>
+  </property>
+ </widget>
+
+ <widget class="QLabel" name="lblTodayMissions">
+  <property name="geometry">
+   <rect>
+    <x>35</x>
+    <y>115</y>
+    <width>290</width>
+    <height>42</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    color: #b0ffd0; 
+    font-size: 14pt; 
+    font-weight: bold; 
+    background: rgba(50, 100, 80, 0.6);
+    border-radius: 10px;
+    padding: 0 14px;
+    border: none;
+   </string>
+  </property>
+  <property name="text">
+   <string>Missions Today: 5</string>   <!-- ← changed to non-zero for testing -->
+  </property>
+  <property name="alignment">
+   <set>Qt::AlignLeft|Qt::AlignVCenter</set>
+  </property>
+ </widget>
+
+ <!-- Chart area - clean placeholder, no stray 0s -->
+ <widget class="QLabel" name="lblMissionsChart">
+  <property name="geometry">
+   <rect>
+    <x>350</x>      <!-- enough space after stats -->
+    <y>60</y>
+    <width>460</width>
+    <height>160</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    background: rgba(35, 35, 70, 0.75);
+    border-radius: 12px;
+    border: 1px solid rgba(110, 180, 255, 0.35);
+   </string>
+  </property>
+  <property name="text">
+   <string>Statistics Chart\n(Empty – add QChartView here)\nExample: Total vs Today vs Planned</string>
+  </property>
+  <property name="alignment">
+   <set>Qt::AlignCenter</set>
+  </property>
+ </widget>
+
+</widget>
     <widget class="QTableWidget" name="tableMissions">
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>120</y>
+       <y>240</y>
        <width>1070</width>
-       <height>580</height>
+       <height>280</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -1672,184 +1917,273 @@ QHeaderView::section {
     </widget>
    </widget>
 
-   <!-- PAGE ADD MISSION (Form) -->
-   <widget class="QWidget" name="pageAddMission">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>0</y>
-      <width>1170</width>
-      <height>850</height>
-     </rect>
-    </property>
-    <property name="visible">
-     <bool>false</bool>
-    </property>
-    
-    <widget class="QLabel" name="bgAddMission">
-     <property name="geometry">
-      <rect>
-       <x>200</x>
-       <y>100</y>
-       <width>750</width>
-       <height>550</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: #8e944e; border-radius: 15px;</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    
-    <widget class="QWidget" name="formMissionContainer">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>120</y>
-       <width>710</width>
-       <height>510</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: white; border-radius: 10px;</string>
-     </property>
-     
-     <widget class="QLabel" name="lblMissionFormTitle">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>20</y>
-        <width>710</width>
-        <height>50</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: #8e944e; font-size: 20pt; font-weight: bold; background-color: transparent;</string>
-      </property>
-      <property name="text">
-       <string>Ajouter une nouvelle mission</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-     
-     <widget class="QPushButton" name="btnCloseForm">
-      <property name="geometry">
-       <rect>
-        <x>650</x>
-        <y>20</y>
-        <width>40</width>
-        <height>40</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: transparent; color: #8e944e; font-size: 18pt;</string>
-      </property>
-      <property name="text">
-       <string>X</string>
-      </property>
-      <property name="flat">
-       <bool>true</bool>
-      </property>
-     </widget>
-     
-     <widget class="QLabel" name="lblDate">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>100</y>
-        <width>150</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: #8e944e; font-size: 12pt; font-weight: bold; background-color: transparent;</string>
-      </property>
-      <property name="text">
-       <string>Date Mission:</string>
-      </property>
-     </widget>
-     
-     <widget class="QCalendarWidget" name="calendarMission">
-      <property name="geometry">
-       <rect>
-        <x>280</x>
-        <y>100</y>
-        <width>350</width>
-        <height>150</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #8e944e; border-radius: 8px;</string>
-      </property>
-     </widget>
-     
-     <widget class="QLabel" name="lblHeureDebut">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>270</y>
-        <width>150</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: #8e944e; font-size: 12pt; font-weight: bold; background-color: transparent;</string>
-      </property>
-      <property name="text">
-       <string>Heure Début:</string>
-      </property>
-     </widget>
-     
-     <widget class="QTimeEdit" name="timeEditDebut">
-      <property name="geometry">
-       <rect>
-        <x>280</x>
-        <y>270</y>
-        <width>350</width>
-        <height>40</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: white; border: 2px solid #8e944e; border-radius: 8px; padding: 5px; font-size: 11pt; color: #333;</string>
-      </property>
-     </widget>
-     
-     <widget class="QLabel" name="lblHeureFin">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>320</y>
-        <width>150</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: #8e944e; font-size: 12pt; font-weight: bold; background-color: transparent;</string>
-      </property>
-      <property name="text">
-       <string>Heure Fin:</string>
-      </property>
-     </widget>
-     
-     <widget class="QTimeEdit" name="timeEditFin">
-      <property name="geometry">
-       <rect>
-        <x>280</x>
-        <y>320</y>
-        <width>350</width>
-        <height>40</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: white; border: 2px solid #8e944e; border-radius: 8px; padding: 5px; font-size: 11pt; color: #333;</string>
-      </property>
-     </widget>
-     
-     <widget class="QLabel" name="lblStatutZone">
+   <!-- IMPROVED PAGE ADD / EDIT MISSION -->
+<widget class="QWidget" name="pageAddMission">
+ <property name="geometry">
+  <rect>
+   <x>230</x>
+   <y>0</y>
+   <width>1170</width>
+   <height>850</height>
+  </rect>
+ </property>
+ <property name="visible">
+  <bool>false</bool>
+ </property>
+
+ <!-- Background -->
+ <widget class="QLabel" name="bgAddMission">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1170</width>
+    <height>850</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #f8f7f4, stop:1 #e8e6e0);</string>
+  </property>
+ </widget>
+
+ <!-- Form Card -->
+ <widget class="QWidget" name="formCard">
+  <property name="geometry">
+   <rect>
+    <x>200</x>
+    <y>80</y>
+    <width>770</width>
+    <height>680</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: white; border-radius: 16px; border: 1px solid #d0d0d0; box-shadow: 0px 8px 24px rgba(0,0,0,0.1);</string>
+  </property>
+
+  <!-- Title -->
+  <widget class="QLabel" name="lblMissionFormTitle">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>30</y>
+     <width>710</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 24pt; font-weight: bold; color: #8e944e; background: transparent;</string>
+   </property>
+   <property name="text">
+    <string>Ajouter une Mission</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+
+  <!-- Close button -->
+  <widget class="QPushButton" name="btnCloseForm">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>30</y>
+     <width>50</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton { background: transparent; color: #8e944e; font-size: 24pt; border: none; } QPushButton:hover { color: #6d7339; }</string>
+   </property>
+   <property name="text">
+    <string>×</string>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
+  </widget>
+
+  <!-- Date -->
+  <widget class="QLabel" name="lblDate">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>100</y>
+     <width>180</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #555; font-size: 14pt; font-weight: bold;</string>
+   </property>
+   <property name="text">
+    <string>Date de la mission :</string>
+   </property>
+  </widget>
+
+  <!-- Calendar -->
+  <widget class="QCalendarWidget" name="calendarMission">
+ <property name="geometry">
+  <rect>
+   <x>60</x>
+   <y>150</y>
+   <width>600</width>
+   <height>210</height> <!-- big enough for 6 rows + padding -->
+  </rect>
+ </property>
+ <property name="styleSheet">
+  <string notr="true">
+   QCalendarWidget {
+    background-color: #ffffff;
+    color: #000000 !important;
+    font-size: 14pt;
+    border: 2px solid #ffffff;
+    border-radius: 10px;
+   }
+   QCalendarWidget QAbstractItemView {
+    background-color: #ffffff;
+    color: #000000 !important;
+    selection-background-color: #fcfcfc;
+    selection-color: white;
+    alternate-background-color: #f8f8f8;
+   }
+   QCalendarWidget QWidget#qt_calendar_navigationbar {
+    background-color: #ffffff;
+    color: white !important;
+   }
+   QCalendarWidget QToolButton {
+    color: black !important;
+   }
+   QCalendarWidget QMenu {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+   }
+   QCalendarWidget QMenu::item {
+    color: #000000 !important;
+   }
+   QCalendarWidget QMenu::item:selected {
+    background-color: #ffffff !important;
+    color: black !important;
+   }
+  </string>
+ </property>
+ <property name="gridVisible">
+  <bool>true</bool>
+ </property>
+ <property name="horizontalHeaderFormat">
+  <enum>QCalendarWidget::ShortDayNames</enum>
+ </property>
+ <property name="verticalHeaderFormat">
+  <enum>QCalendarWidget::NoVerticalHeader</enum>
+ </property>
+ <property name="minimumDate">
+  <date>
+   <year>2020</year>
+   <month>1</month>
+   <day>1</day>
+  </date>
+ </property>
+ <property name="maximumDate">
+  <date>
+   <year>2030</year>
+   <month>12</month>
+   <day>31</day>
+  </date>
+ </property>
+</widget>
+
+  <!-- Heure Début -->
+  <widget class="QLabel" name="lblHeureDebut">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>520</y>
+     <width>180</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #555; font-size: 14pt; font-weight: bold;</string>
+   </property>
+   <property name="text">
+    <string>Heure de début :</string>
+   </property>
+  </widget>
+
+  <widget class="QTimeEdit" name="timeEditDebut">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>520</y>
+     <width>180</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: white; border: 1px solid #d0d0d0; border-radius: 8px; padding: 6px; font-size: 14pt; color: #333;</string>
+   </property>
+   <property name="displayFormat">
+    <string>HH:mm</string>
+   </property>
+  </widget>
+
+  <!-- Heure Fin -->
+  <widget class="QLabel" name="lblHeureFin">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>520</y>
+     <width>180</width>
+     <height>35</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #555; font-size: 14pt; font-weight: bold;</string>
+   </property>
+   <property name="text">
+    <string>Heure de fin :</string>
+   </property>
+  </widget>
+
+  <widget class="QTimeEdit" name="timeEditFin">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>520</y>
+     <width>180</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; padding: 6px; font-size: 14pt; color: #666;</string>
+   </property>
+   <property name="displayFormat">
+    <string>HH:mm</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+
+  <!-- Estimation Button -->
+  <widget class="QPushButton" name="btnEstimerFin">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>10</y>
+     <width>100000</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton { background: #8e944e; color: white; border-radius: 8px; font-size: 12pt; } QPushButton:hover { background: #6d7339; }</string>
+   </property>
+   <property name="text">
+    <string>Estimer</string>
+   </property>
+  </widget>
+
+  <!-- Zone -->
+       <widget class="QLabel" name="lblZone">
       <property name="geometry">
        <rect>
         <x>80</x>
@@ -1862,10 +2196,10 @@ QHeaderView::section {
        <string notr="true">color: #8e944e; font-size: 12pt; font-weight: bold; background-color: transparent;</string>
       </property>
       <property name="text">
-       <string>Statut Zone:</string>
+       <string>Zone :</string>
       </property>
      </widget>
-     
+
      <widget class="QLineEdit" name="lineEditZone">
       <property name="geometry">
        <rect>
@@ -1882,7 +2216,7 @@ QHeaderView::section {
        <string>e.g., Rue France</string>
       </property>
      </widget>
-     
+
      <widget class="QLabel" name="lblListeEmployes">
       <property name="geometry">
        <rect>
@@ -1899,7 +2233,7 @@ QHeaderView::section {
        <string>Liste Employés:</string>
       </property>
      </widget>
-     
+
      <widget class="QLineEdit" name="lineEditEmployes">
       <property name="geometry">
        <rect>
@@ -1916,12 +2250,29 @@ QHeaderView::section {
        <string>e.g., 1,4,6 (IDs séparés par virgule)</string>
       </property>
      </widget>
-     
+
+     <widget class="QPushButton" name="btnEstimerFin">
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>600</y>
+        <width>150</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton { background-color: #8e944e; color: white; border-radius: 8px; font-size: 12pt; } QPushButton:hover { background-color: #6d7339; }</string>
+      </property>
+      <property name="text">
+       <string>Estimer Heure Fin</string>
+      </property>
+     </widget>
+
      <widget class="QPushButton" name="btnSaveMission">
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>470</y>
+        <y>600</y>
         <width>150</width>
         <height>50</height>
        </rect>
@@ -1946,12 +2297,12 @@ QPushButton:pressed {
        <string>Enregistrer</string>
       </property>
      </widget>
-     
+
      <widget class="QPushButton" name="btnCancelMission">
       <property name="geometry">
        <rect>
         <x>380</x>
-        <y>470</y>
+        <y>600</y>
         <width>150</width>
         <height>50</height>
        </rect>
@@ -1976,9 +2327,9 @@ QPushButton:pressed {
        <string>Annuler</string>
       </property>
      </widget>
-    </widget>
-   </widget>
-  </widget>
+    </widget> <!-- closes formMissionContainer or whatever your inner container is -->
+   </widget> <!-- closes pageAddMission -->
+  </widget> <!-- closes centralwidget -->
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>

@@ -1,0 +1,37 @@
+﻿# === Qt Creator / CMake / Qt build files ===
+
+# Build directories
+build/
+bin/
+lib/
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.exe
+
+# Qt Creator user/project settings
+*.user
+*.user.*.prefs
+*.pro.user
+*.pro.user.*.prefs
+*.qbs.user
+*.qmlproject.user
+
+# MOC / UIC / RCC generated files
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+*.moc
+*.moc.h
+
+# Clangd / Code completion cache
+.qtc_clangd/
+*.idx
+
+# Other temporary files
+*.log
+*.tmp
+*.swp
+*.DS_Store

@@ -192,6 +192,11 @@ private slots:
     void onSaveMissionForm();
     void onCancelMissionForm();
     void onCloseMissionForm();
+    void on_btnSearchMission_clicked();
+    void on_btnApplySortGroup_clicked();
+    void on_btnEstimerFin_clicked();
+    void drawMissionsChart();
+   
 
 private:
     Ui::MainWindow *ui;

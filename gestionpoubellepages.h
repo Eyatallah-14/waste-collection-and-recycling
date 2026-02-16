@@ -40,10 +40,13 @@ private slots:
     void modifierPoubelle();
     void supprimerPoubelle();
     void rechercherPoubelle();
-    void trierPoubelles();
+    void trierParEtat();
+    void trierParType();
     void exporterPDF();
+    void exporterCSV();
     void afficherNotification();
     void chargerHistorique();
+    void uploadImage();
 
 private:
     Ui::GestionPoubellePage *ui;
