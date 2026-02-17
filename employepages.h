@@ -3,11 +3,9 @@
 
 #include <QWidget>
 
-QT_BEGIN_NAMESPACE
 namespace Ui {
 class EmployePages;
 }
-QT_END_NAMESPACE
 
 class EmployePages : public QWidget
 {
@@ -17,6 +15,7 @@ public:
     explicit EmployePages(QWidget *parent = nullptr);
     ~EmployePages();
 
+private slots:
     void showListPage();
     void showFormPage();
     void showStatsPage();

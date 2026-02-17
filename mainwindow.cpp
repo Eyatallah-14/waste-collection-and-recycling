@@ -1,45 +1,38 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-
+#include "employepages.h"
+#include "zonepages.h"
+#include "gestionpoubellepages.h"
 #include <QPushButton>
 #include <QWidget>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QGridLayout>
 #include <QIcon>
 #include <QDebug>
 #include <QPropertyAnimation>
 #include <QTimer>
-#include <QLabel>
-#include <QLineEdit>
-#include <QComboBox>
-#include <QTextEdit>
-#include <QTableWidget>
-#include <QHeaderView>
-#include <QEvent>
-
-#include <QChartView>
-#include <QPieSeries>
-#include <QPieSlice>
-#include <QBarSeries>
-#include <QBarSet>
-#include <QBarCategoryAxis>
-#include <QValueAxis>
-
+#include <QMessageBox>
+#include <QInputDialog>
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
+#include <QPainter>
+#include <algorithm>
 
 //==============================================================================
-// CONSTRUCTOR - Initialize the main window and setup UI components
+// CONSTRUCTOR
 //==============================================================================
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , currentPage(PAGE_MISSIONS)
+    , nextVehiculeId(1)
+    , editingVehiculeId(-1)
+    , nextMissionId(1)
+    , editingMissionId(-1)
 {
     ui->setupUi(this);
 
-    //--------------------------------------------------------------------------
-    // TABLE WIDGET CONFIGURATION
-    //--------------------------------------------------------------------------
+    // Configuration des tableaux
     ui->tableWidget->setShowGrid(true);
     ui->tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->tableWidget->verticalHeader()->setVisible(false);
@@ -47,155 +40,151 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidget->setFocusPolicy(Qt::NoFocus);
     ui->tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
 
-    ui->tableWidget->setColumnWidth(0, 180);
-    ui->tableWidget->setColumnWidth(1, 180);
-    ui->tableWidget->setColumnWidth(2, 180);
-    ui->tableWidget->setColumnWidth(3, 180);
-    ui->tableWidget->setColumnWidth(4, 180);
-    ui->tableWidget->setColumnWidth(5, 240);
+    ui->tableSearchWidget->setShowGrid(true);
+    ui->tableSearchWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->tableSearchWidget->verticalHeader()->setVisible(false);
+    ui->tableSearchWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableSearchWidget->setFocusPolicy(Qt::NoFocus);
+    ui->tableSearchWidget->setSelectionMode(QAbstractItemView::NoSelection);
 
-    ui->tableWidget->setRowCount(0);
+    ui->tableSortWidget->setShowGrid(true);
+    ui->tableSortWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->tableSortWidget->verticalHeader()->setVisible(false);
+    ui->tableSortWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableSortWidget->setFocusPolicy(Qt::NoFocus);
+    ui->tableSortWidget->setSelectionMode(QAbstractItemView::NoSelection);
 
-    //--------------------------------------------------------------------------
-    // LOGO AND ICON CONFIGURATION
-    //--------------------------------------------------------------------------
+    // Configuration du tableau Missions
+    ui->tableMissions->setShowGrid(true);
+    ui->tableMissions->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->tableMissions->verticalHeader()->setVisible(false);
+    ui->tableMissions->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableMissions->setFocusPolicy(Qt::NoFocus);
+    ui->tableMissions->setSelectionMode(QAbstractItemView::NoSelection);
+
+    // Chargement des icônes
     originalLogoPixmap = QPixmap(":/images/logo.png");
     ui->logo->setPixmap(originalLogoPixmap);
     ui->logo->setScaledContents(true);
 
-    ui->missions_icon->setPixmap(
-        QPixmap(":/images/mission_logo.png").scaled(
-            ui->missions_icon->size(),
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-            )
-        );
-    ui->missions_icon->setScaledContents(true);
+    ui->missions_icon->setPixmap(QPixmap(":/images/mission_logo.png").scaled(
+        ui->missions_icon->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    ui->zone_icon->setPixmap(
-        QPixmap(":/images/zone_icon.png").scaled(
-            ui->zone_icon->size(),
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-            )
-        );
-    ui->zone_icon->setScaledContents(true);
+    ui->zone_icon->setPixmap(QPixmap(":/images/zone_icon.png").scaled(
+        ui->zone_icon->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    ui->poubelle_icon->setPixmap(
-        QPixmap(":/images/poubelle_icon.png").scaled(
-            ui->poubelle_icon->size(),
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-            )
-        );
-    ui->poubelle_icon->setScaledContents(true);
+    ui->poubelle_icon->setPixmap(QPixmap(":/images/poubelle_icon.png").scaled(
+        ui->poubelle_icon->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    ui->employe_icon->setPixmap(
-        QPixmap(":/images/employe_icon.png").scaled(
-            ui->employe_icon->size(),
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-            )
-        );
-    ui->employe_icon->setScaledContents(true);
+    ui->employe_icon->setPixmap(QPixmap(":/images/employe_icon.png").scaled(
+        ui->employe_icon->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    ui->vehicule_icon->setPixmap(
-        QPixmap(":/images/truck_icon.png").scaled(
-            ui->vehicule_icon->size(),
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-            )
-        );
-    ui->vehicule_icon->setScaledContents(true);
+    ui->vehicule_icon->setPixmap(QPixmap(":/images/truck_icon.png").scaled(
+        ui->vehicule_icon->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    //--------------------------------------------------------------------------
-    // CONNECT ICON CLICK EVENTS
-    //--------------------------------------------------------------------------
+    // Chatbot icon
+    QPixmap chatbotPixmap(":/images/chatbot.png");
+    if (!chatbotPixmap.isNull()) {
+        chatbotPixmap = chatbotPixmap.scaled(90, 90, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        ui->btnChatbot->setIcon(QIcon(chatbotPixmap));
+        ui->btnChatbot->setIconSize(QSize(90, 90));
+    } else {
+        QFont font = ui->btnChatbot->font();
+        font.setPointSize(36);
+        ui->btnChatbot->setFont(font);
+        ui->btnChatbot->setText("🤖");
+    }
+
+    // Event filters
     ui->missions_icon->installEventFilter(this);
     ui->zone_icon->installEventFilter(this);
     ui->poubelle_icon->installEventFilter(this);
     ui->employe_icon->installEventFilter(this);
     ui->vehicule_icon->installEventFilter(this);
 
-    ui->missions_icon->setCursor(Qt::PointingHandCursor);
-    ui->zone_icon->setCursor(Qt::PointingHandCursor);
-    ui->poubelle_icon->setCursor(Qt::PointingHandCursor);
-    ui->employe_icon->setCursor(Qt::PointingHandCursor);
-    ui->vehicule_icon->setCursor(Qt::PointingHandCursor);
+    // Populate combo boxes for form
+    ui->comboType->addItems({"Camion Benne", "Camion Compacteur", "Camionnette",
+                             "Tracteur", "Poids Lourd"});
+    ui->comboEtat->addItems({"disponible", "en panne", "en maintenance"});
+    ui->comboCarburant->addItems({"diesel", "essence", "hybride", "électrique"});
 
-    ui->missions_icon->setToolTip("Missions");
-    ui->zone_icon->setToolTip("Zones");
-    ui->poubelle_icon->setToolTip("Poubelles");
-    ui->employe_icon->setToolTip("Employes");
-    ui->vehicule_icon->setToolTip("Vehicules");
+    // Populate combo box for sort
+    ui->comboSortCriteria->addItems({"ID", "Type", "Capacité", "État", "Carburant"});
 
-    //--------------------------------------------------------------------------
-    // SHOW DEFAULT PAGE (MISSIONS)
-    //--------------------------------------------------------------------------
-    employeePages = new EmployePages(ui->centralwidget);
-    employeePages->setGeometry(ui->tableWidget->geometry());
-    employeePages->setVisible(false);
+    // Connect form buttons
+    connect(ui->btnSaveVehicule, &QPushButton::clicked, this, &MainWindow::onSaveVehiculeForm);
+    connect(ui->btnCancelForm, &QPushButton::clicked, this, &MainWindow::onCancelForm);
 
+    // Connect search buttons
+    connect(ui->btnApplySearch, &QPushButton::clicked, this, &MainWindow::onApplySearch);
+    connect(ui->btnBackFromSearch, &QPushButton::clicked, this, &MainWindow::onBackToVehiculeList);
+
+    // Connect sort buttons
+    connect(ui->btnApplySort, &QPushButton::clicked, this, &MainWindow::onApplySort);
+    connect(ui->btnBackFromSort, &QPushButton::clicked, this, &MainWindow::onBackToVehiculeList);
+
+    // Connect stats button
+    connect(ui->btnBackFromStats, &QPushButton::clicked, this, &MainWindow::onBackToVehiculeList);
+
+    // Connect chatbot buttons
+    connect(ui->btnSendChat, &QPushButton::clicked, this, [this]() {
+        QString userInput = ui->lineEditChatInput->text();
+        if (!userInput.isEmpty()) {
+            QString currentText = ui->textChatDisplay->toPlainText();
+            currentText += "\n👤 Vous: " + userInput + "\n";
+            currentText += "🤖 Bot: Je suis là pour vous aider avec la gestion des véhicules!\n";
+            ui->textChatDisplay->setText(currentText);
+            ui->lineEditChatInput->clear();
+        }
+    });
+    connect(ui->btnBackFromChatbot, &QPushButton::clicked, this, &MainWindow::onBackToVehiculeList);
+
+    // ─── Missions connections ───────────────────────────────────────────────
+    connect(ui->btnAddMission, &QPushButton::clicked, this, &MainWindow::onAddMissionClicked);
+    connect(ui->btnSaveMission, &QPushButton::clicked, this, &MainWindow::onSaveMissionForm);
+    connect(ui->btnCancelMission, &QPushButton::clicked, this, &MainWindow::onCancelMissionForm);
+    connect(ui->btnCloseForm, &QPushButton::clicked, this, &MainWindow::onCloseMissionForm);
+
+    // Charger les données
+    loadVehicules();
+    loadMissions();
+
+    // Initialize employee pages widget
+    employePages = new EmployePages(this);
+    employePages->setGeometry(230, 0, 1170, 850);  // Same position as vehicle pages
+    employePages->setVisible(false);
+
+    // Initialize zone pages widget
+    zonePages = new ZonePages(this);
+    zonePages->setGeometry(230, 0, 1170, 850);  // Same position as other pages
+    zonePages->setVisible(false);
+
+    // Initialize poubelle pages widget
+    poubellePages = new GestionPoubellePage(this);
+    poubellePages->setGeometry(230, 0, 1170, 850);  // Same position as other pages
+    poubellePages->setVisible(false);
+    zonePages->hide();
+
+    // Afficher page par défaut
     showMissionsPage();
 }
 
 //==============================================================================
-// EVENT FILTER - Handle icon clicks
+// DESTRUCTOR
+//==============================================================================
+MainWindow::~MainWindow()
+{
+    delete employePages;
+    delete zonePages;
+    delete poubellePages;
+    delete ui;
+}
+
+//==============================================================================
+// EVENT FILTER
 //==============================================================================
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    auto setIconHover = [](QLabel *label, bool isHover) {
-        if (!label) {
-            return;
-        }
-
-        if (isHover) {
-            label->setStyleSheet(
-                "background-color: rgba(142, 148, 78, 0.18);"
-                "border-radius: 12px;"
-                "padding: 4px;"
-                );
-        } else {
-            label->setStyleSheet("background-color: transparent;");
-        }
-    };
-
-    if (event->type() == QEvent::Enter) {
-        if (obj == ui->missions_icon) {
-            setIconHover(ui->missions_icon, true);
-            return false;
-        } else if (obj == ui->zone_icon) {
-            setIconHover(ui->zone_icon, true);
-            return false;
-        } else if (obj == ui->poubelle_icon) {
-            setIconHover(ui->poubelle_icon, true);
-            return false;
-        } else if (obj == ui->employe_icon) {
-            setIconHover(ui->employe_icon, true);
-            return false;
-        } else if (obj == ui->vehicule_icon) {
-            setIconHover(ui->vehicule_icon, true);
-            return false;
-        }
-    } else if (event->type() == QEvent::Leave) {
-        if (obj == ui->missions_icon) {
-            setIconHover(ui->missions_icon, false);
-            return false;
-        } else if (obj == ui->zone_icon) {
-            setIconHover(ui->zone_icon, false);
-            return false;
-        } else if (obj == ui->poubelle_icon) {
-            setIconHover(ui->poubelle_icon, false);
-            return false;
-        } else if (obj == ui->employe_icon) {
-            setIconHover(ui->employe_icon, false);
-            return false;
-        } else if (obj == ui->vehicule_icon) {
-            setIconHover(ui->vehicule_icon, false);
-            return false;
-        }
-    }
-
     if (event->type() == QEvent::MouseButtonPress) {
         if (obj == ui->missions_icon) {
             on_pushButton_8_clicked();
@@ -218,488 +207,1159 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 }
 
 //==============================================================================
-// PAGE MANAGEMENT FUNCTIONS
+// LOAD VEHICULES
 //==============================================================================
-
-//------------------------------------------------------------------------------
-// CLEAR PAGE - Hide all page content
-//------------------------------------------------------------------------------
-void MainWindow::clearPage()
+void MainWindow::loadVehicules()
 {
-    ui->tableWidget->setVisible(false);
-    ui->pushButton_2->setVisible(false);
-    ui->label->setVisible(false);
-    ui->tableWidget->setRowCount(0);
-    if (employeePages) {
-        employeePages->setVisible(false);
-    }
+    vehicules.clear();
 
-    qDebug() << "Page cleared";
+    vehicules.append(Vehicule(nextVehiculeId++, "Camion Benne", 15.5f, "disponible", "diesel"));
+    vehicules.append(Vehicule(nextVehiculeId++, "Camion Compacteur", 20.0f, "en panne", "diesel"));
+    vehicules.append(Vehicule(nextVehiculeId++, "Camionnette", 5.5f, "disponible", "essence"));
+    vehicules.append(Vehicule(nextVehiculeId++, "Tracteur", 25.0f, "disponible", "diesel"));
+    vehicules.append(Vehicule(nextVehiculeId++, "Camion Benne", 18.0f, "en panne", "hybride"));
+
+    allVehicules = vehicules; // Sauvegarder une copie
+
+    qDebug() << "Loaded" << vehicules.size() << "vehicules";
 }
 
-//------------------------------------------------------------------------------
-// SHOW MISSIONS PAGE
-//------------------------------------------------------------------------------
+//==============================================================================
+// LOAD MISSIONS (TEST DATA)
+//==============================================================================
+void MainWindow::loadMissions()
+{
+    missions.clear();
+
+    missions.append(Mission(nextMissionId++, "2025-02-10", "07:30", "13:00", "Rue France", "1,4,6"));
+    missions.append(Mission(nextMissionId++, "2025-02-11", "08:00", "16:30", "Avenue Habib Bourguiba", "2,5"));
+    missions.append(Mission(nextMissionId++, "2025-02-12", "06:45", "14:15", "Lac 1", "3"));
+
+    qDebug() << "Loaded" << missions.size() << "missions";
+}
+
+//==============================================================================
+// PAGE MANAGEMENT
+//==============================================================================
+
+void MainWindow::clearAllPages()
+{
+    ui->pageVehiculeList->setVisible(false);
+    ui->pageAddVehicule->setVisible(false);
+    ui->pageSearch->setVisible(false);
+    ui->pageSort->setVisible(false);
+    ui->pageStats->setVisible(false);
+    ui->pageChatbot->setVisible(false);
+    ui->pageMissions->setVisible(false);
+    ui->pageAddMission->setVisible(false);
+    employePages->setVisible(false);
+
+    ui->tableWidget->setRowCount(0);
+    ui->tableSearchWidget->setRowCount(0);
+    ui->tableSortWidget->setRowCount(0);
+}
+
 void MainWindow::showMissionsPage()
 {
-    clearPage();
+    clearAllPages();
     currentPage = PAGE_MISSIONS;
+    ui->pageMissions->setVisible(true);
 
-    ui->tableWidget->setVisible(true);
-    ui->pushButton_2->setVisible(true);
-    ui->label->setVisible(false);
-
-    ui->pushButton_2->setText("Lancer une nouvelle mission");
-
-    ui->tableWidget->setColumnCount(6);
-
-    QStringList headers;
-    headers << "Mission N°" << "Zone" << "Workers" << "Start Time"
-            << "End Time" << "Operations";
-    ui->tableWidget->setHorizontalHeaderLabels(headers);
-
-    ui->tableWidget->setColumnWidth(0, 160);
-    ui->tableWidget->setColumnWidth(1, 160);
-    ui->tableWidget->setColumnWidth(2, 150);
-    ui->tableWidget->setColumnWidth(3, 150);
-    ui->tableWidget->setColumnWidth(4, 150);
-    ui->tableWidget->setColumnWidth(5, 180);
-
-    addRowWithButtons(0, "1", "ariana", "1,2,3,7", "15/08/2026 7Pm", "8Pm");
-
-    qDebug() << "Missions page displayed";
+    setupMissionsTableHeaders();
+    refreshMissionsTable();
 }
 
-//------------------------------------------------------------------------------
-// SHOW ZONES PAGE
-//------------------------------------------------------------------------------
 void MainWindow::showZonesPage()
 {
-    clearPage();
+    clearAllPages();
     currentPage = PAGE_ZONES;
-
-    qDebug() << "Zones page displayed (empty)";
 }
 
-//------------------------------------------------------------------------------
-// SHOW POUBELLE PAGE
-//------------------------------------------------------------------------------
 void MainWindow::showPoubellePage()
 {
-    clearPage();
+    clearAllPages();
     currentPage = PAGE_POUBELLE;
-
-    qDebug() << "Poubelle page displayed (empty)";
+    poubellePages->setVisible(true);
 }
 
-//------------------------------------------------------------------------------
-// SHOW EMPLOYE PAGE - BRAINWAVE STYLE LIST VIEW
-//------------------------------------------------------------------------------
 void MainWindow::showEmployePage()
 {
-    clearPage();
+    clearAllPages();
     currentPage = PAGE_EMPLOYE;
-
-    if (!employeePages) {
-        return;
-    }
-
-    employeePages->setVisible(true);
-    employeePages->raise();
-    employeePages->showListPage();
-
-    qDebug() << "Employee List page displayed";
+    employePages->setVisible(true);
 }
 
-//------------------------------------------------------------------------------
-// SHOW EMPLOYEE FORM PAGE
-//------------------------------------------------------------------------------
-void MainWindow::showEmployeeForm()
-{
-    clearPage();
-    currentPage = PAGE_EMPLOYE;
-
-    if (!employeePages) {
-        return;
-    }
-
-    employeePages->setVisible(true);
-    employeePages->raise();
-    employeePages->showFormPage();
-
-    qDebug() << "Employee Form page displayed";
-}
-
-//------------------------------------------------------------------------------
-// SHOW EMPLOYEE STATISTICS PAGE
-//------------------------------------------------------------------------------
-void MainWindow::showEmployeeStatistics()
-{
-    clearPage();
-    currentPage = PAGE_EMPLOYE;
-
-    if (!employeePages) {
-        return;
-    }
-
-    employeePages->setVisible(true);
-    employeePages->raise();
-    employeePages->showStatsPage();
-
-    qDebug() << "Employee Statistics page displayed";
-}
-
-//------------------------------------------------------------------------------
-// SHOW VEHICULE PAGE
-//------------------------------------------------------------------------------
 void MainWindow::showVehiculePage()
 {
-    clearPage();
+    clearAllPages();
     currentPage = PAGE_VEHICULE;
 
-    qDebug() << "Vehicule page displayed (empty)";
+    // Restaurer les données complètes
+    vehicules = allVehicules;
+
+    ui->pageVehiculeList->setVisible(true);
+
+    // Disconnect all previous connections
+    disconnect(ui->pushButton_2, nullptr, nullptr, nullptr);
+    disconnect(ui->btnSearch, nullptr, nullptr, nullptr);
+    disconnect(ui->btnSort, nullptr, nullptr, nullptr);
+    disconnect(ui->btnStats, nullptr, nullptr, nullptr);
+    disconnect(ui->btnExportPDF, nullptr, nullptr, nullptr);
+    disconnect(ui->btnChatbot, nullptr, nullptr, nullptr);
+
+    // Connect buttons
+    connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::onAddVehiculeClicked);
+    connect(ui->btnSearch, &QPushButton::clicked, this, &MainWindow::onSearchClicked);
+    connect(ui->btnSort, &QPushButton::clicked, this, &MainWindow::onSortClicked);
+    connect(ui->btnStats, &QPushButton::clicked, this, &MainWindow::onStatsClicked);
+    connect(ui->btnExportPDF, &QPushButton::clicked, this, &MainWindow::onExportPDFClicked);
+    connect(ui->btnChatbot, &QPushButton::clicked, this, &MainWindow::onChatbotClicked);
+
+    setupVehiculeTableHeaders();
+    refreshVehiculeTable();
+}
+
+void MainWindow::showAddVehiculePage()
+{
+    clearAllPages();
+    currentPage = PAGE_ADD_VEHICULE;
+    ui->pageAddVehicule->setVisible(true);
+
+    // Clear form
+    ui->comboType->setCurrentIndex(0);
+    ui->spinCapacite->setValue(0.0);
+    ui->comboEtat->setCurrentIndex(0);
+    ui->comboCarburant->setCurrentIndex(0);
+
+    if (editingVehiculeId >= 0) {
+        ui->lblFormTitle->setText("Modifier le véhicule");
+
+        // Find vehicle and populate form
+        for (const auto& v : std::as_const(allVehicules)) {
+            if (v.id() == editingVehiculeId) {
+                ui->comboType->setCurrentText(v.type());
+                ui->spinCapacite->setValue(v.capaciteMax());
+                ui->comboEtat->setCurrentText(v.etat());
+                ui->comboCarburant->setCurrentText(v.carburant());
+                break;
+            }
+        }
+    } else {
+        ui->lblFormTitle->setText("Ajouter un nouveau véhicule");
+    }
+}
+
+void MainWindow::showSearchPage()
+{
+    clearAllPages();
+    currentPage = PAGE_SEARCH;
+    ui->pageSearch->setVisible(true);
+    ui->lineEditSearch->clear();
+    setupSearchTableHeaders();
+    refreshSearchTable();
+}
+
+void MainWindow::showSortPage()
+{
+    clearAllPages();
+    currentPage = PAGE_SORT;
+    ui->pageSort->setVisible(true);
+    ui->comboSortCriteria->setCurrentIndex(0);
+    setupSortTableHeaders();
+    refreshSortTable();
+}
+
+void MainWindow::showStatsPage()
+{
+    clearAllPages();
+    currentPage = PAGE_STATS;
+    ui->pageStats->setVisible(true);
+    drawStatsChart();
+}
+
+void MainWindow::showChatbotPage()
+{
+    clearAllPages();
+    currentPage = PAGE_CHATBOT;
+    ui->pageChatbot->setVisible(true);
+    ui->textChatDisplay->clear();
+    ui->lineEditChatInput->clear();
+    ui->textChatDisplay->setText("🤖 Assistant: Bonjour! Comment puis-je vous aider aujourd'hui?\n");
+}
+
+void MainWindow::showAddMissionPage()
+{
+    clearAllPages();
+    currentPage = PAGE_ADD_MISSION;
+    ui->pageAddMission->setVisible(true);
+
+    // Reset form
+    ui->calendarMission->setSelectedDate(QDate::currentDate());
+    ui->timeEditDebut->setTime(QTime(8, 0));
+    ui->timeEditFin->setTime(QTime(16, 0));
+    ui->lineEditZone->clear();
+    ui->lineEditEmployes->clear();
+
+    if (editingMissionId >= 0) {
+        ui->lblMissionFormTitle->setText("Modifier la mission");
+
+        for (const auto& m : std::as_const(missions)) {
+            if (m.id() == editingMissionId) {
+                ui->calendarMission->setSelectedDate(QDate::fromString(m.date(), "yyyy-MM-dd"));
+                ui->timeEditDebut->setTime(QTime::fromString(m.heureDebut(), "HH:mm"));
+                ui->timeEditFin->setTime(QTime::fromString(m.heureFin(), "HH:mm"));
+                ui->lineEditZone->setText(m.statutZone());
+                ui->lineEditEmployes->setText(m.listeEmployes());
+                break;
+            }
+        }
+    } else {
+        ui->lblMissionFormTitle->setText("Ajouter une nouvelle mission");
+    }
 }
 
 //==============================================================================
-// NAVIGATION BUTTON HANDLERS
+// MISSIONS TABLE SETUP
+//==============================================================================
+void MainWindow::setupMissionsTableHeaders()
+{
+    ui->tableMissions->setColumnCount(7);
+    ui->tableMissions->setHorizontalHeaderLabels({
+        "ID Mission", "Date Mission", "Heure Début", "Heure Fin",
+        "Statut Zone", "Liste Employés", "Opérations"
+    });
+
+    ui->tableMissions->setColumnWidth(0, 100);
+    ui->tableMissions->setColumnWidth(1, 150);
+    ui->tableMissions->setColumnWidth(2, 120);
+    ui->tableMissions->setColumnWidth(3, 120);
+    ui->tableMissions->setColumnWidth(4, 200);
+    ui->tableMissions->setColumnWidth(5, 180);
+    ui->tableMissions->setColumnWidth(6, 180);
+
+    ui->tableMissions->setShowGrid(true);
+    ui->tableMissions->verticalHeader()->setVisible(false);
+    ui->tableMissions->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableMissions->setFocusPolicy(Qt::NoFocus);
+    ui->tableMissions->setSelectionMode(QAbstractItemView::NoSelection);
+}
+
+void MainWindow::refreshMissionsTable()
+{
+    ui->tableMissions->setRowCount(0);
+    for (const auto& m : missions) {
+        addMissionRowWithButtons(ui->tableMissions->rowCount(), m);
+    }
+}
+
+void MainWindow::addMissionRowWithButtons(int row, const Mission& mission)
+{
+    ui->tableMissions->insertRow(row);
+    ui->tableMissions->setRowHeight(row, 60);
+
+    ui->tableMissions->setItem(row, 0, new QTableWidgetItem(QString::number(mission.id())));
+    ui->tableMissions->setItem(row, 1, new QTableWidgetItem(mission.date()));
+    ui->tableMissions->setItem(row, 2, new QTableWidgetItem(mission.heureDebut()));
+    ui->tableMissions->setItem(row, 3, new QTableWidgetItem(mission.heureFin()));
+    ui->tableMissions->setItem(row, 4, new QTableWidgetItem(mission.statutZone()));
+    ui->tableMissions->setItem(row, 5, new QTableWidgetItem(mission.listeEmployes()));
+
+    QWidget *buttonWidget = new QWidget();
+    QHBoxLayout *layout = new QHBoxLayout(buttonWidget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(10);
+    layout->setAlignment(Qt::AlignCenter);
+
+    QSize buttonSize(35, 35);
+
+    QPushButton *btnUpdate = new QPushButton();
+    btnUpdate->setIcon(QIcon(QPixmap(":/images/update.png").scaled(
+        buttonSize, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    btnUpdate->setIconSize(buttonSize);
+    btnUpdate->setFixedSize(buttonSize);
+    btnUpdate->setFlat(true);
+    btnUpdate->setProperty("missionId", mission.id());
+    connect(btnUpdate, &QPushButton::clicked, this, &MainWindow::onUpdateMissionClicked);
+
+    QPushButton *btnDelete = new QPushButton();
+    btnDelete->setIcon(QIcon(QPixmap(":/images/delete.png").scaled(
+        buttonSize, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    btnDelete->setIconSize(buttonSize);
+    btnDelete->setFixedSize(buttonSize);
+    btnDelete->setFlat(true);
+    btnDelete->setProperty("missionId", mission.id());
+    connect(btnDelete, &QPushButton::clicked, this, &MainWindow::onDeleteMissionClicked);
+
+    layout->addWidget(btnUpdate);
+    layout->addWidget(btnDelete);
+
+    ui->tableMissions->setCellWidget(row, 6, buttonWidget);
+}
+
+//==============================================================================
+// MISSIONS ACTIONS
 //==============================================================================
 
-void MainWindow::on_pushButton_5_clicked()
+void MainWindow::onAddMissionClicked()
 {
-    showZonesPage();
+    editingMissionId = -1;
+    showAddMissionPage();
 }
 
-void MainWindow::on_pushButton_6_clicked()
+void MainWindow::onUpdateMissionClicked()
 {
-    showPoubellePage();
+    QPushButton *btn = qobject_cast<QPushButton*>(sender());
+    if (!btn) return;
+    editingMissionId = btn->property("missionId").toInt();
+    showAddMissionPage();
 }
 
-void MainWindow::on_pushButton_7_clicked()
+void MainWindow::onDeleteMissionClicked()
 {
-    showEmployePage();
+    QPushButton *btn = qobject_cast<QPushButton*>(sender());
+    if (!btn) return;
+
+    int id = btn->property("missionId").toInt();
+
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this, "Confirmation",
+        QString("Voulez-vous vraiment supprimer la mission ID %1 ?").arg(id),
+        QMessageBox::Yes | QMessageBox::No
+        );
+
+    if (reply == QMessageBox::Yes) {
+        for (int i = 0; i < missions.size(); ++i) {
+            if (missions[i].id() == id) {
+                missions.removeAt(i);
+                break;
+            }
+        }
+        refreshMissionsTable();
+        QMessageBox::information(this, "Succès", "Mission supprimée.");
+    }
 }
 
-void MainWindow::on_pushButton_8_clicked()
+void MainWindow::onSaveMissionForm()
 {
+    QString date = ui->calendarMission->selectedDate().toString("yyyy-MM-dd");
+    QString heureDebut = ui->timeEditDebut->time().toString("HH:mm");
+    QString heureFin = ui->timeEditFin->time().toString("HH:mm");
+    QString zone = ui->lineEditZone->text().trimmed();
+    QString employes = ui->lineEditEmployes->text().trimmed();
+
+    if (zone.isEmpty() || employes.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez remplir la zone et les employés.");
+        return;
+    }
+
+    if (ui->timeEditDebut->time() >= ui->timeEditFin->time()) {
+        QMessageBox::warning(this, "Erreur", "L'heure de fin doit être après l'heure de début.");
+        return;
+    }
+
+    if (editingMissionId >= 0) {
+        // Update
+        for (auto &m : missions) {
+            if (m.id() == editingMissionId) {
+                m = Mission(m.id(), date, heureDebut, heureFin, zone, employes);
+                break;
+            }
+        }
+        QMessageBox::information(this, "Succès", "Mission modifiée.");
+    } else {
+        // Add
+        missions.append(Mission(nextMissionId++, date, heureDebut, heureFin, zone, employes));
+        QMessageBox::information(this, "Succès", "Mission ajoutée.");
+    }
+
+    editingMissionId = -1;
     showMissionsPage();
 }
 
-void MainWindow::on_pushButton_9_clicked()
+void MainWindow::onCancelMissionForm()
+{
+    editingMissionId = -1;
+    showMissionsPage();
+}
+
+void MainWindow::onCloseMissionForm()
+{
+    onCancelMissionForm();
+}
+
+//==============================================================================
+// VEHICULE TABLE SETUP (your original code continues here)
+//==============================================================================
+
+void MainWindow::setupVehiculeTableHeaders()
+{
+    ui->tableWidget->setColumnCount(7);
+    ui->tableWidget->setHorizontalHeaderLabels({
+        "ID", "Type", "Capacité (m³)", "État", "Carburant", "Opérations", "Email"
+    });
+    ui->tableWidget->setColumnWidth(0, 80);
+    ui->tableWidget->setColumnWidth(1, 200);
+    ui->tableWidget->setColumnWidth(2, 150);
+    ui->tableWidget->setColumnWidth(3, 150);
+    ui->tableWidget->setColumnWidth(4, 120);
+    ui->tableWidget->setColumnWidth(5, 180);
+    ui->tableWidget->setColumnWidth(6, 120);
+}
+void MainWindow::setupSearchTableHeaders()
+{
+    ui->tableSearchWidget->setColumnCount(7);
+    ui->tableSearchWidget->setHorizontalHeaderLabels({
+        "ID", "Type", "Capacité (m³)", "État", "Carburant", "Opérations", "Email"
+    });
+
+    ui->tableSearchWidget->setColumnWidth(0, 80);
+    ui->tableSearchWidget->setColumnWidth(1, 200);
+    ui->tableSearchWidget->setColumnWidth(2, 150);
+    ui->tableSearchWidget->setColumnWidth(3, 150);
+    ui->tableSearchWidget->setColumnWidth(4, 120);
+    ui->tableSearchWidget->setColumnWidth(5, 180);
+    ui->tableSearchWidget->setColumnWidth(6, 120);
+
+    ui->tableSearchWidget->setShowGrid(true);
+    ui->tableSearchWidget->verticalHeader()->setVisible(false);
+    ui->tableSearchWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableSearchWidget->setFocusPolicy(Qt::NoFocus);
+    ui->tableSearchWidget->setSelectionMode(QAbstractItemView::NoSelection);
+}
+void MainWindow::setupSortTableHeaders()
+{
+    ui->tableSortWidget->setColumnCount(7);
+    ui->tableSortWidget->setHorizontalHeaderLabels({
+        "ID", "Type", "Capacité (m³)", "État", "Carburant", "Opérations", "Email"
+    });
+
+    ui->tableSortWidget->setColumnWidth(0, 80);
+    ui->tableSortWidget->setColumnWidth(1, 200);
+    ui->tableSortWidget->setColumnWidth(2, 150);
+    ui->tableSortWidget->setColumnWidth(3, 150);
+    ui->tableSortWidget->setColumnWidth(4, 120);
+    ui->tableSortWidget->setColumnWidth(5, 180);
+    ui->tableSortWidget->setColumnWidth(6, 120);
+}
+
+void MainWindow::refreshVehiculeTable()
+{
+    ui->tableWidget->setRowCount(0);
+
+    for (int i = 0; i < vehicules.size(); ++i) {
+        addVehiculeRowWithButtons(ui->tableWidget->rowCount(), vehicules[i]);
+    }
+}
+
+void MainWindow::refreshSearchTable()
+{
+    ui->tableSearchWidget->setRowCount(0);
+
+    for (int i = 0; i < allVehicules.size(); ++i) {
+        addVehiculeRowToSearchTable(ui->tableSearchWidget->rowCount(), allVehicules[i]);
+    }
+}
+
+void MainWindow::refreshSortTable()
+{
+    ui->tableSortWidget->setRowCount(0);
+
+    for (int i = 0; i < allVehicules.size(); ++i) {
+        addVehiculeRowToSortTable(ui->tableSortWidget->rowCount(), allVehicules[i]);
+    }
+}
+
+void MainWindow::addVehiculeRowWithButtons(int row, const Vehicule& vehicule)
+{
+    ui->tableWidget->insertRow(row);
+    ui->tableWidget->setRowHeight(row, 60);
+
+    ui->tableWidget->setItem(row, 0, new QTableWidgetItem(QString::number(vehicule.id())));
+    ui->tableWidget->setItem(row, 1, new QTableWidgetItem(vehicule.type()));
+    ui->tableWidget->setItem(row, 2, new QTableWidgetItem(QString::number(vehicule.capaciteMax(), 'f', 1)));
+    ui->tableWidget->setItem(row, 3, new QTableWidgetItem(vehicule.etat()));
+    ui->tableWidget->setItem(row, 4, new QTableWidgetItem(vehicule.carburant()));
+
+    // Operations buttons
+    QWidget *buttonWidget = new QWidget();
+    QHBoxLayout *layout = new QHBoxLayout(buttonWidget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(10);
+    layout->setAlignment(Qt::AlignCenter);
+
+    QSize buttonSize(35, 35);
+
+    QPushButton *btnUpdate = new QPushButton();
+    btnUpdate->setIcon(QIcon(QPixmap(":/images/update.png").scaled(
+        buttonSize, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    btnUpdate->setIconSize(buttonSize);
+    btnUpdate->setFixedSize(buttonSize);
+    btnUpdate->setFlat(true);
+    btnUpdate->setProperty("vehiculeId", vehicule.id());
+    connect(btnUpdate, &QPushButton::clicked, this, &MainWindow::onUpdateVehiculeClicked);
+
+    QPushButton *btnDelete = new QPushButton();
+    btnDelete->setIcon(QIcon(QPixmap(":/images/delete.png").scaled(
+        buttonSize, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    btnDelete->setIconSize(buttonSize);
+    btnDelete->setFixedSize(buttonSize);
+    btnDelete->setFlat(true);
+    btnDelete->setProperty("vehiculeId", vehicule.id());
+    connect(btnDelete, &QPushButton::clicked, this, &MainWindow::onDeleteVehiculeClicked);
+
+    layout->addWidget(btnUpdate);
+    layout->addWidget(btnDelete);
+
+    ui->tableWidget->setCellWidget(row, 5, buttonWidget);
+
+    // Email button
+    QPushButton *btnEmail = new QPushButton("📧");
+    btnEmail->setFixedSize(50, 40);
+    btnEmail->setStyleSheet("QPushButton { background-color: #8e944e; color: white; border-radius: 8px; font-size: 16pt; } QPushButton:hover { background-color: #6d7339; }");
+    btnEmail->setProperty("vehiculeId", vehicule.id());
+    connect(btnEmail, &QPushButton::clicked, this, &MainWindow::onSendEmailClicked);
+
+    QWidget *emailWidget = new QWidget();
+    QHBoxLayout *emailLayout = new QHBoxLayout(emailWidget);
+    emailLayout->setContentsMargins(0, 0, 0, 0);
+    emailLayout->setAlignment(Qt::AlignCenter);
+    emailLayout->addWidget(btnEmail);
+
+    ui->tableWidget->setCellWidget(row, 6, emailWidget);
+}
+
+void MainWindow::addVehiculeRowToSearchTable(int row, const Vehicule& vehicule)
+{
+    ui->tableSearchWidget->insertRow(row);
+    ui->tableSearchWidget->setRowHeight(row, 60);
+
+    ui->tableSearchWidget->setItem(row, 0, new QTableWidgetItem(QString::number(vehicule.id())));
+    ui->tableSearchWidget->setItem(row, 1, new QTableWidgetItem(vehicule.type()));
+    ui->tableSearchWidget->setItem(row, 2, new QTableWidgetItem(QString::number(vehicule.capaciteMax(), 'f', 1)));
+    ui->tableSearchWidget->setItem(row, 3, new QTableWidgetItem(vehicule.etat()));
+    ui->tableSearchWidget->setItem(row, 4, new QTableWidgetItem(vehicule.carburant()));
+
+    // Operations buttons
+    QWidget *buttonWidget = new QWidget();
+    QHBoxLayout *layout = new QHBoxLayout(buttonWidget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(10);
+    layout->setAlignment(Qt::AlignCenter);
+
+    QSize buttonSize(35, 35);
+
+    QPushButton *btnUpdate = new QPushButton();
+    btnUpdate->setIcon(QIcon(QPixmap(":/images/update.png").scaled(
+        buttonSize, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    btnUpdate->setIconSize(buttonSize);
+    btnUpdate->setFixedSize(buttonSize);
+    btnUpdate->setFlat(true);
+    btnUpdate->setProperty("vehiculeId", vehicule.id());
+    connect(btnUpdate, &QPushButton::clicked, this, &MainWindow::onUpdateVehiculeClicked);
+
+    QPushButton *btnDelete = new QPushButton();
+    btnDelete->setIcon(QIcon(QPixmap(":/images/delete.png").scaled(
+        buttonSize, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    btnDelete->setIconSize(buttonSize);
+    btnDelete->setFixedSize(buttonSize);
+    btnDelete->setFlat(true);
+    btnDelete->setProperty("vehiculeId", vehicule.id());
+    connect(btnDelete, &QPushButton::clicked, this, &MainWindow::onDeleteVehiculeClicked);
+
+    layout->addWidget(btnUpdate);
+    layout->addWidget(btnDelete);
+
+    ui->tableSearchWidget->setCellWidget(row, 5, buttonWidget);
+
+    // Email button
+    QPushButton *btnEmail = new QPushButton("📧");
+    btnEmail->setFixedSize(50, 40);
+    btnEmail->setStyleSheet("QPushButton { background-color: #8e944e; color: white; border-radius: 8px; font-size: 16pt; } QPushButton:hover { background-color: #6d7339; }");
+    btnEmail->setProperty("vehiculeId", vehicule.id());
+    connect(btnEmail, &QPushButton::clicked, this, &MainWindow::onSendEmailClicked);
+
+    QWidget *emailWidget = new QWidget();
+    QHBoxLayout *emailLayout = new QHBoxLayout(emailWidget);
+    emailLayout->setContentsMargins(0, 0, 0, 0);
+    emailLayout->setAlignment(Qt::AlignCenter);
+    emailLayout->addWidget(btnEmail);
+
+    ui->tableSearchWidget->setCellWidget(row, 6, emailWidget);
+}
+
+void MainWindow::addVehiculeRowToSortTable(int row, const Vehicule& vehicule)
+{
+    ui->tableSortWidget->insertRow(row);
+    ui->tableSortWidget->setRowHeight(row, 60);
+
+    ui->tableSortWidget->setItem(row, 0, new QTableWidgetItem(QString::number(vehicule.id())));
+    ui->tableSortWidget->setItem(row, 1, new QTableWidgetItem(vehicule.type()));
+    ui->tableSortWidget->setItem(row, 2, new QTableWidgetItem(QString::number(vehicule.capaciteMax(), 'f', 1)));
+    ui->tableSortWidget->setItem(row, 3, new QTableWidgetItem(vehicule.etat()));
+    ui->tableSortWidget->setItem(row, 4, new QTableWidgetItem(vehicule.carburant()));
+
+    // Operations buttons
+    QWidget *buttonWidget = new QWidget();
+    QHBoxLayout *layout = new QHBoxLayout(buttonWidget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(10);
+    layout->setAlignment(Qt::AlignCenter);
+
+    QSize buttonSize(35, 35);
+
+    QPushButton *btnUpdate = new QPushButton();
+    btnUpdate->setIcon(QIcon(QPixmap(":/images/update.png").scaled(
+        buttonSize, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    btnUpdate->setIconSize(buttonSize);
+    btnUpdate->setFixedSize(buttonSize);
+    btnUpdate->setFlat(true);
+    btnUpdate->setProperty("vehiculeId", vehicule.id());
+    connect(btnUpdate, &QPushButton::clicked, this, &MainWindow::onUpdateVehiculeClicked);
+
+    QPushButton *btnDelete = new QPushButton();
+    btnDelete->setIcon(QIcon(QPixmap(":/images/delete.png").scaled(
+        buttonSize, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    btnDelete->setIconSize(buttonSize);
+    btnDelete->setFixedSize(buttonSize);
+    btnDelete->setFlat(true);
+    btnDelete->setProperty("vehiculeId", vehicule.id());
+    connect(btnDelete, &QPushButton::clicked, this, &MainWindow::onDeleteVehiculeClicked);
+
+    layout->addWidget(btnUpdate);
+    layout->addWidget(btnDelete);
+
+    ui->tableSortWidget->setCellWidget(row, 5, buttonWidget);
+
+    // Email button
+    QPushButton *btnEmail = new QPushButton("📧");
+    btnEmail->setFixedSize(50, 40);
+    btnEmail->setStyleSheet("QPushButton { background-color: #8e944e; color: white; border-radius: 8px; font-size: 16pt; } QPushButton:hover { background-color: #6d7339; }");
+    btnEmail->setProperty("vehiculeId", vehicule.id());
+    connect(btnEmail, &QPushButton::clicked, this, &MainWindow::onSendEmailClicked);
+
+    QWidget *emailWidget = new QWidget();
+    QHBoxLayout *emailLayout = new QHBoxLayout(emailWidget);
+    emailLayout->setContentsMargins(0, 0, 0, 0);
+    emailLayout->setAlignment(Qt::AlignCenter);
+    emailLayout->addWidget(btnEmail);
+
+    ui->tableSortWidget->setCellWidget(row, 6, emailWidget);
+}
+
+//==============================================================================
+// VEHICULE ACTIONS
+//==============================================================================
+
+void MainWindow::onAddVehiculeClicked()
+{
+    editingVehiculeId = -1;
+    showAddVehiculePage();
+}
+
+void MainWindow::onUpdateVehiculeClicked()
+{
+    QPushButton *btn = qobject_cast<QPushButton*>(sender());
+    if (!btn) return;
+
+    int vehiculeId = btn->property("vehiculeId").toInt();
+    editingVehiculeId = vehiculeId;
+    showAddVehiculePage();
+}
+
+void MainWindow::onDeleteVehiculeClicked()
+{
+    QPushButton *btn = qobject_cast<QPushButton*>(sender());
+    if (!btn) return;
+
+    int vehiculeId = btn->property("vehiculeId").toInt();
+
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this, "Confirmation",
+        QString("Voulez-vous vraiment supprimer le véhicule ID %1?").arg(vehiculeId),
+        QMessageBox::Yes | QMessageBox::No
+        );
+
+    if (reply == QMessageBox::Yes) {
+        // Delete from allVehicules
+        for (int i = 0; i < allVehicules.size(); ++i) {
+            if (allVehicules[i].id() == vehiculeId) {
+                allVehicules.removeAt(i);
+                break;
+            }
+        }
+
+        // Delete from vehicules
+        for (int i = 0; i < vehicules.size(); ++i) {
+            if (vehicules[i].id() == vehiculeId) {
+                vehicules.removeAt(i);
+                break;
+            }
+        }
+
+        // Refresh appropriate table based on current page
+        if (currentPage == PAGE_VEHICULE) {
+            refreshVehiculeTable();
+        } else if (currentPage == PAGE_SEARCH) {
+            refreshSearchTable();
+        } else if (currentPage == PAGE_SORT) {
+            refreshSortTable();
+        }
+
+        QMessageBox::information(this, "Suppression", "Véhicule supprimé avec succès!");
+    }
+}
+
+void MainWindow::onSendEmailClicked()
+{
+    QPushButton *btn = qobject_cast<QPushButton*>(sender());
+    if (!btn) return;
+
+    int vehiculeId = btn->property("vehiculeId").toInt();
+
+    for (const auto& v : std::as_const(allVehicules)) {
+        if (v.id() == vehiculeId) {
+            QString message = QString("Rapport Véhicule ID %1\n\nType: %2\nCapacité: %3 m³\n"
+                                      "État: %4\nCarburant: %5\n\n✅ Email envoyé avec succès!")
+                                  .arg(v.id())
+                                  .arg(v.type())
+                                  .arg(v.capaciteMax())
+                                  .arg(v.etat())
+                                  .arg(v.carburant());
+
+            QMessageBox::information(this, "Email Envoyé", message);
+            break;
+        }
+    }
+}
+
+//==============================================================================
+// BUTTON HANDLERS
+//==============================================================================
+
+void MainWindow::onSearchClicked()
+{
+    showSearchPage();
+}
+
+void MainWindow::onSortClicked()
+{
+    showSortPage();
+}
+
+void MainWindow::onStatsClicked()
+{
+    showStatsPage();
+}
+
+void MainWindow::onExportPDFClicked()
+{
+    exportVehiculesToPDF();
+}
+
+void MainWindow::onChatbotClicked()
+{
+    showChatbotPage();
+}
+
+//==============================================================================
+// FORM ACTIONS
+//==============================================================================
+
+void MainWindow::onSaveVehiculeForm()
+{
+    QString type = ui->comboType->currentText();
+    float capacite = ui->spinCapacite->value();
+    QString etat = ui->comboEtat->currentText();
+    QString carburant = ui->comboCarburant->currentText();
+
+    if (capacite <= 0) {
+        QMessageBox::warning(this, "Erreur", "La capacité doit être supérieure à 0!");
+        return;
+    }
+
+    if (editingVehiculeId >= 0) {
+        // Update existing vehicle
+        for (int i = 0; i < allVehicules.size(); ++i) {
+            if (allVehicules[i].id() == editingVehiculeId) {
+                allVehicules[i].setType(type);
+                allVehicules[i].setCapaciteMax(capacite);
+                allVehicules[i].setEtat(etat);
+                allVehicules[i].setCarburant(carburant);
+                QMessageBox::information(this, "Succès", "Véhicule modifié avec succès!");
+                break;
+            }
+        }
+    } else {
+        // Add new vehicle
+        Vehicule newVehicule(nextVehiculeId++, type, capacite, etat, carburant);
+        allVehicules.append(newVehicule);
+        QMessageBox::information(this, "Succès", "Véhicule ajouté avec succès!");
+    }
+
+    editingVehiculeId = -1;
+    showVehiculePage();
+}
+
+void MainWindow::onCancelForm()
+{
+    editingVehiculeId = -1;
+    showVehiculePage();
+}
+
+void MainWindow::onApplySearch()
+{
+    QString searchText = ui->lineEditSearch->text();
+
+    if (searchText.isEmpty()) {
+        refreshSearchTable();
+        return;
+    }
+
+    ui->tableSearchWidget->setRowCount(0);
+
+    for (int i = 0; i < allVehicules.size(); ++i) {
+        bool match = allVehicules[i].type().contains(searchText, Qt::CaseInsensitive) ||
+                     allVehicules[i].etat().contains(searchText, Qt::CaseInsensitive) ||
+                     allVehicules[i].carburant().contains(searchText, Qt::CaseInsensitive);
+
+        if (match) {
+            addVehiculeRowToSearchTable(ui->tableSearchWidget->rowCount(), allVehicules[i]);
+        }
+    }
+
+    if (ui->tableSearchWidget->rowCount() == 0) {
+        QMessageBox::information(this, "Recherche", "Aucun véhicule trouvé.");
+        refreshSearchTable();
+    }
+}
+
+void MainWindow::onApplySort()
+{
+    QString criteria = ui->comboSortCriteria->currentText();
+
+    // Create a temporary copy for sorting
+    QList<Vehicule> sortedVehicules = allVehicules;
+
+    if (criteria == "ID") {
+        std::sort(sortedVehicules.begin(), sortedVehicules.end(),
+                  [](const Vehicule& a, const Vehicule& b) { return a.id() < b.id(); });
+    } else if (criteria == "Type") {
+        std::sort(sortedVehicules.begin(), sortedVehicules.end(),
+                  [](const Vehicule& a, const Vehicule& b) { return a.type() < b.type(); });
+    } else if (criteria == "Capacité") {
+        std::sort(sortedVehicules.begin(), sortedVehicules.end(),
+                  [](const Vehicule& a, const Vehicule& b) { return a.capaciteMax() < b.capaciteMax(); });
+    } else if (criteria == "État") {
+        std::sort(sortedVehicules.begin(), sortedVehicules.end(),
+                  [](const Vehicule& a, const Vehicule& b) { return a.etat() < b.etat(); });
+    } else if (criteria == "Carburant") {
+        std::sort(sortedVehicules.begin(), sortedVehicules.end(),
+                  [](const Vehicule& a, const Vehicule& b) { return a.carburant() < b.carburant(); });
+    }
+
+    // Display sorted results
+    ui->tableSortWidget->setRowCount(0);
+    for (int i = 0; i < sortedVehicules.size(); ++i) {
+        addVehiculeRowToSortTable(ui->tableSortWidget->rowCount(), sortedVehicules[i]);
+    }
+}
+
+void MainWindow::onBackToVehiculeList()
 {
     showVehiculePage();
 }
 
 //==============================================================================
-// ADD ROW WITH BUTTONS (FOR MISSIONS)
+// UTILITY FUNCTIONS
 //==============================================================================
-void MainWindow::addRowWithButtons(int row, QString missionNum, QString zone,
-                                   QString workers, QString startTime, QString endTime)
+
+void MainWindow::searchVehicules(const QString& searchText)
 {
-    ui->tableWidget->insertRow(row);
-    ui->tableWidget->setRowHeight(row, 60);
+    QList<Vehicule> filteredVehicules;
 
-    ui->tableWidget->setItem(row, 0, new QTableWidgetItem(missionNum));
-    ui->tableWidget->setItem(row, 1, new QTableWidgetItem(zone));
-    ui->tableWidget->setItem(row, 2, new QTableWidgetItem(workers));
-    ui->tableWidget->setItem(row, 3, new QTableWidgetItem(startTime));
-    ui->tableWidget->setItem(row, 4, new QTableWidgetItem(endTime));
+    for (const auto& v : std::as_const(allVehicules)) {
+        bool match = v.type().contains(searchText, Qt::CaseInsensitive) ||
+                     v.etat().contains(searchText, Qt::CaseInsensitive) ||
+                     v.carburant().contains(searchText, Qt::CaseInsensitive);
 
-    QWidget *buttonWidget = new QWidget();
-    buttonWidget->setStyleSheet("background-color: transparent;");
-    QHBoxLayout *layout = new QHBoxLayout(buttonWidget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(15);
-    layout->setAlignment(Qt::AlignCenter);
+        if (match) {
+            filteredVehicules.append(v);
+        }
+    }
 
-    QSize buttonSize(40, 40);
+    if (filteredVehicules.isEmpty()) {
+        QMessageBox::information(this, "Recherche", "Aucun véhicule trouvé.");
+    } else {
+        vehicules = filteredVehicules;
+    }
+}
 
-    QPushButton *btnChange = new QPushButton();
-    QPixmap updatePixmap(":/images/update.png");
-    updatePixmap = updatePixmap.scaled(buttonSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    btnChange->setIcon(QIcon(updatePixmap));
-    btnChange->setIconSize(buttonSize);
-    btnChange->setFixedSize(buttonSize);
-    btnChange->setFlat(true);
-    btnChange->setStyleSheet("QPushButton { background: transparent; border: none; }");
+void MainWindow::sortVehicules(const QString& criteria)
+{
+    if (criteria == "ID") {
+        std::sort(vehicules.begin(), vehicules.end(),
+                  [](const Vehicule& a, const Vehicule& b) { return a.id() < b.id(); });
+    } else if (criteria == "Type") {
+        std::sort(vehicules.begin(), vehicules.end(),
+                  [](const Vehicule& a, const Vehicule& b) { return a.type() < b.type(); });
+    } else if (criteria == "Capacité") {
+        std::sort(vehicules.begin(), vehicules.end(),
+                  [](const Vehicule& a, const Vehicule& b) { return a.capaciteMax() < b.capaciteMax(); });
+    } else if (criteria == "État") {
+        std::sort(vehicules.begin(), vehicules.end(),
+                  [](const Vehicule& a, const Vehicule& b) { return a.etat() < b.etat(); });
+    } else if (criteria == "Carburant") {
+        std::sort(vehicules.begin(), vehicules.end(),
+                  [](const Vehicule& a, const Vehicule& b) { return a.carburant() < b.carburant(); });
+    }
+}
 
-    ImageButtonHoverFilter *updateFilter = new ImageButtonHoverFilter(
-        btnChange, ":/images/update.png", ":/images/update_hover.png",
-        ":/images/update_clicked.png", buttonSize
-        );
+void MainWindow::showVehiculeStats()
+{
+    int total = allVehicules.size();
+    int disponibles = 0;
+    int enPanne = 0;
 
-    QPushButton *btnDelete = new QPushButton();
-    QPixmap deletePixmap(":/images/delete.png");
-    deletePixmap = deletePixmap.scaled(buttonSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    btnDelete->setIcon(QIcon(deletePixmap));
-    btnDelete->setIconSize(buttonSize);
-    btnDelete->setFixedSize(buttonSize);
-    btnDelete->setFlat(true);
-    btnDelete->setStyleSheet("QPushButton { background: transparent; border: none; }");
+    for (const auto& v : std::as_const(allVehicules)) {
+        if (v.etat() == "disponible") disponibles++;
+        else if (v.etat() == "en panne") enPanne++;
+    }
 
-    ImageButtonHoverFilter *deleteFilter = new ImageButtonHoverFilter(
-        btnDelete, ":/images/delete.png", ":/images/delete_hover.png",
-        ":/images/delete_clicked.png", buttonSize
-        );
+    QString stats = QString("📊 STATISTIQUES\n\nTotal: %1\nDisponibles: %2\nEn panne: %3")
+                        .arg(total).arg(disponibles).arg(enPanne);
 
-    layout->addWidget(btnChange);
-    layout->addWidget(btnDelete);
+    QMessageBox::information(this, "Statistiques", stats);
+}
 
-    ui->tableWidget->setCellWidget(row, 5, buttonWidget);
+void MainWindow::drawStatsChart()
+{
+    int total = allVehicules.size();
+    int disponibles = 0;
+    int enPanne = 0;
+    int maintenance = 0;
+
+    for (const auto& v : std::as_const(allVehicules)) {
+        if (v.etat() == "disponible") disponibles++;
+        else if (v.etat() == "en panne") enPanne++;
+        else if (v.etat() == "en maintenance") maintenance++;
+    }
+
+    // Create pixmap for drawing
+    QPixmap pixmap(600, 400);
+    pixmap.fill(Qt::transparent);
+
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    // Draw pie chart
+    QRect rect(50, 50, 300, 300);
+
+    if (total > 0) {
+        int angle = 0;
+
+        // Disponibles (green)
+        int disponiblesAngle = (disponibles * 360 * 16) / total;
+        painter.setBrush(QColor(142, 148, 78));
+        painter.setPen(Qt::white);
+        painter.drawPie(rect, angle, disponiblesAngle);
+        angle += disponiblesAngle;
+
+        // En panne (red)
+        int enPanneAngle = (enPanne * 360 * 16) / total;
+        painter.setBrush(QColor(200, 50, 50));
+        painter.drawPie(rect, angle, enPanneAngle);
+        angle += enPanneAngle;
+
+        // Maintenance (orange)
+        int maintenanceAngle = (maintenance * 360 * 16) / total;
+        painter.setBrush(QColor(255, 165, 0));
+        painter.drawPie(rect, angle, maintenanceAngle);
+    }
+
+    // Draw legend
+    int legendX = 400;
+    int legendY = 100;
+
+    painter.setFont(QFont("Arial", 12, QFont::Bold));
+
+    // Disponibles
+    painter.setBrush(QColor(142, 148, 78));
+    painter.drawRect(legendX, legendY, 30, 20);
+    painter.setPen(QColor(142, 148, 78));
+    painter.drawText(legendX + 40, legendY + 15, QString("Disponibles: %1").arg(disponibles));
+
+    // En panne
+    legendY += 40;
+    painter.setBrush(QColor(200, 50, 50));
+    painter.drawRect(legendX, legendY, 30, 20);
+    painter.setPen(QColor(200, 50, 50));
+    painter.drawText(legendX + 40, legendY + 15, QString("En panne: %1").arg(enPanne));
+
+    // Maintenance
+    legendY += 40;
+    painter.setBrush(QColor(255, 165, 0));
+    painter.drawRect(legendX, legendY, 30, 20);
+    painter.setPen(QColor(255, 165, 0));
+    painter.drawText(legendX + 40, legendY + 15, QString("Maintenance: %1").arg(maintenance));
+
+    painter.end();
+
+    ui->lblStatsChart->setPixmap(pixmap);
+}
+
+void MainWindow::exportVehiculesToPDF()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, "Exporter",
+                                                    "vehicules.html", "HTML Files (*.html)");
+
+    if (fileName.isEmpty()) return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Erreur", "Impossible de créer le fichier!");
+        return;
+    }
+
+    QString html = "<!DOCTYPE html><html><head><meta charset='UTF-8'><style>"
+                   "body{font-family:Arial;margin:40px;}h1{color:#8e944e;text-align:center;}"
+                   "table{width:100%;border-collapse:collapse;margin-top:20px;}"
+                   "th,td{border:1px solid #8e944e;padding:12px;text-align:left;}"
+                   "th{background-color:#8e944e;color:white;}</style></head><body>"
+                   "<h1>Liste des Véhicules</h1><table>"
+                   "<tr><th>ID</th><th>Type</th><th>Capacité</th><th>État</th><th>Carburant</th></tr>";
+
+    for (const auto& v : std::as_const(allVehicules)) {
+        html += QString("<tr><td>%1</td><td>%2</td><td>%3 m³</td><td>%4</td><td>%5</td></tr>")
+                    .arg(v.id())
+                    .arg(v.type())
+                    .arg(v.capaciteMax(), 0, 'f', 1)
+                    .arg(v.etat())
+                    .arg(v.carburant());
+    }
+
+    html += "</table></body></html>";
+
+    QTextStream out(&file);
+    out << html;
+    file.close();
+
+    QMessageBox::information(this, "Export", "Fichier HTML créé avec succès!\nOuvrez-le dans un navigateur.");
 }
 
 //==============================================================================
-// ADD EMPLOYE ROW WITH BUTTONS (LEGACY - NOT USED IN NEW BRAINWAVE INTERFACE)
+// MISSIONS (EXAMPLE)
 //==============================================================================
-void MainWindow::addEmployeRowWithButtons(int row, QString id_employe, QString nom,
-                                          QString prenom, QString mot_de_passe,
-                                          QString telephone, QString salaire, QString etat)
-{
-    // This function is kept for backwards compatibility but is not used
-    // in the new BrainWave employee interface
-}
 
 //==============================================================================
-// SIDEBAR TOGGLE ANIMATION
+// SIDEBAR ANIMATION
 //==============================================================================
+
 void MainWindow::on_pushButton_clicked()
 {
     static bool isCollapsed = false;
-    int slideDistance = 50;
-    int iconSlideDistance = -20;
-    int animationDuration = 300;
 
     if (!isCollapsed) {
+        ui->pushButton->setText(">");
         ui->pushButton_5->setVisible(false);
         ui->pushButton_6->setVisible(false);
         ui->pushButton_7->setVisible(false);
         ui->pushButton_8->setVisible(false);
         ui->pushButton_9->setVisible(false);
-
-        QPropertyAnimation *labelAnim = new QPropertyAnimation(ui->label, "geometry");
-        labelAnim->setDuration(animationDuration);
-        labelAnim->setStartValue(ui->label->geometry());
-        QRect newLabelRect = ui->label->geometry();
-        newLabelRect.moveLeft(newLabelRect.left() - slideDistance);
-        labelAnim->setEndValue(newLabelRect);
-        labelAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        labelAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *logoScaleAnim = new QPropertyAnimation(ui->logo, "geometry");
-        logoScaleAnim->setDuration(animationDuration);
-        logoScaleAnim->setStartValue(ui->logo->geometry());
-        QRect newLogoRect = ui->logo->geometry();
-        newLogoRect.setWidth(newLogoRect.width() / 3);
-        newLogoRect.setHeight(newLogoRect.height() / 3);
-        newLogoRect.moveLeft(newLogoRect.left() - slideDistance + 80);
-        logoScaleAnim->setEndValue(newLogoRect);
-        logoScaleAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        logoScaleAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        ui->pushButton->setText(">");
-
-        QPropertyAnimation *btnAnim = new QPropertyAnimation(ui->pushButton, "geometry");
-        btnAnim->setDuration(animationDuration);
-        btnAnim->setStartValue(ui->pushButton->geometry());
-        QRect newBtnRect = ui->pushButton->geometry();
-        newBtnRect.moveLeft(newBtnRect.left() - slideDistance);
-        btnAnim->setEndValue(newBtnRect);
-        btnAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        btnAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *missionsIconAnim = new QPropertyAnimation(ui->missions_icon, "geometry");
-        missionsIconAnim->setDuration(animationDuration);
-        missionsIconAnim->setStartValue(ui->missions_icon->geometry());
-        QRect newMissionsIconRect = ui->missions_icon->geometry();
-        newMissionsIconRect.moveLeft(newMissionsIconRect.left() - iconSlideDistance);
-        missionsIconAnim->setEndValue(newMissionsIconRect);
-        missionsIconAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        missionsIconAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *zoneIconAnim = new QPropertyAnimation(ui->zone_icon, "geometry");
-        zoneIconAnim->setDuration(animationDuration);
-        zoneIconAnim->setStartValue(ui->zone_icon->geometry());
-        QRect newZoneIconRect = ui->zone_icon->geometry();
-        newZoneIconRect.moveLeft(newZoneIconRect.left() - iconSlideDistance);
-        zoneIconAnim->setEndValue(newZoneIconRect);
-        zoneIconAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        zoneIconAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *poubelleIconAnim = new QPropertyAnimation(ui->poubelle_icon, "geometry");
-        poubelleIconAnim->setDuration(animationDuration);
-        poubelleIconAnim->setStartValue(ui->poubelle_icon->geometry());
-        QRect newPoubelleIconRect = ui->poubelle_icon->geometry();
-        newPoubelleIconRect.moveLeft(newPoubelleIconRect.left() - iconSlideDistance);
-        poubelleIconAnim->setEndValue(newPoubelleIconRect);
-        poubelleIconAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        poubelleIconAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *employeIconAnim = new QPropertyAnimation(ui->employe_icon, "geometry");
-        employeIconAnim->setDuration(animationDuration);
-        employeIconAnim->setStartValue(ui->employe_icon->geometry());
-        QRect newEmployeIconRect = ui->employe_icon->geometry();
-        newEmployeIconRect.moveLeft(newEmployeIconRect.left() - iconSlideDistance);
-        employeIconAnim->setEndValue(newEmployeIconRect);
-        employeIconAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        employeIconAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *vehiculeIconAnim = new QPropertyAnimation(ui->vehicule_icon, "geometry");
-        vehiculeIconAnim->setDuration(animationDuration);
-        vehiculeIconAnim->setStartValue(ui->vehicule_icon->geometry());
-        QRect newVehiculeIconRect = ui->vehicule_icon->geometry();
-        newVehiculeIconRect.moveLeft(newVehiculeIconRect.left() - iconSlideDistance);
-        vehiculeIconAnim->setEndValue(newVehiculeIconRect);
-        vehiculeIconAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        vehiculeIconAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *tableAnim = new QPropertyAnimation(ui->tableWidget, "geometry");
-        tableAnim->setDuration(animationDuration);
-        tableAnim->setStartValue(ui->tableWidget->geometry());
-        QRect newTableRect = ui->tableWidget->geometry();
-        newTableRect.moveLeft(newTableRect.left() - slideDistance);
-        tableAnim->setEndValue(newTableRect);
-        tableAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        tableAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *btn2Anim = new QPropertyAnimation(ui->pushButton_2, "geometry");
-        btn2Anim->setDuration(animationDuration);
-        btn2Anim->setStartValue(ui->pushButton_2->geometry());
-        QRect newBtn2Rect = ui->pushButton_2->geometry();
-        newBtn2Rect.moveLeft(newBtn2Rect.left() - slideDistance);
-        btn2Anim->setEndValue(newBtn2Rect);
-        btn2Anim->setEasingCurve(QEasingCurve::InOutQuad);
-        btn2Anim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *lineAnim = new QPropertyAnimation(ui->line, "geometry");
-        lineAnim->setDuration(animationDuration);
-        lineAnim->setStartValue(ui->line->geometry());
-        QRect newLineRect = ui->line->geometry();
-        newLineRect.moveLeft(newLineRect.left() - slideDistance - 40);
-        lineAnim->setEndValue(newLineRect);
-        lineAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        lineAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        isCollapsed = true;
-
     } else {
-        QPropertyAnimation *labelAnim = new QPropertyAnimation(ui->label, "geometry");
-        labelAnim->setDuration(animationDuration);
-        labelAnim->setStartValue(ui->label->geometry());
-        QRect newLabelRect = ui->label->geometry();
-        newLabelRect.moveLeft(newLabelRect.left() + slideDistance);
-        labelAnim->setEndValue(newLabelRect);
-        labelAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        labelAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *logoScaleAnim = new QPropertyAnimation(ui->logo, "geometry");
-        logoScaleAnim->setDuration(animationDuration);
-        logoScaleAnim->setStartValue(ui->logo->geometry());
-        QRect newLogoRect = ui->logo->geometry();
-        newLogoRect.setWidth(newLogoRect.width() * 3);
-        newLogoRect.setHeight(newLogoRect.height() * 3);
-        newLogoRect.moveLeft(newLogoRect.left() + slideDistance - 80);
-        logoScaleAnim->setEndValue(newLogoRect);
-        logoScaleAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        logoScaleAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
         ui->pushButton->setText("<");
-
-        QPropertyAnimation *btnAnim = new QPropertyAnimation(ui->pushButton, "geometry");
-        btnAnim->setDuration(animationDuration);
-        btnAnim->setStartValue(ui->pushButton->geometry());
-        QRect newBtnRect = ui->pushButton->geometry();
-        newBtnRect.moveLeft(newBtnRect.left() + slideDistance);
-        btnAnim->setEndValue(newBtnRect);
-        btnAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        btnAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *missionsIconAnim = new QPropertyAnimation(ui->missions_icon, "geometry");
-        missionsIconAnim->setDuration(animationDuration);
-        missionsIconAnim->setStartValue(ui->missions_icon->geometry());
-        QRect newMissionsIconRect = ui->missions_icon->geometry();
-        newMissionsIconRect.moveLeft(newMissionsIconRect.left() + iconSlideDistance);
-        missionsIconAnim->setEndValue(newMissionsIconRect);
-        missionsIconAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        missionsIconAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *zoneIconAnim = new QPropertyAnimation(ui->zone_icon, "geometry");
-        zoneIconAnim->setDuration(animationDuration);
-        zoneIconAnim->setStartValue(ui->zone_icon->geometry());
-        QRect newZoneIconRect = ui->zone_icon->geometry();
-        newZoneIconRect.moveLeft(newZoneIconRect.left() + iconSlideDistance);
-        zoneIconAnim->setEndValue(newZoneIconRect);
-        zoneIconAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        zoneIconAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *poubelleIconAnim = new QPropertyAnimation(ui->poubelle_icon, "geometry");
-        poubelleIconAnim->setDuration(animationDuration);
-        poubelleIconAnim->setStartValue(ui->poubelle_icon->geometry());
-        QRect newPoubelleIconRect = ui->poubelle_icon->geometry();
-        newPoubelleIconRect.moveLeft(newPoubelleIconRect.left() + iconSlideDistance);
-        poubelleIconAnim->setEndValue(newPoubelleIconRect);
-        poubelleIconAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        poubelleIconAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *employeIconAnim = new QPropertyAnimation(ui->employe_icon, "geometry");
-        employeIconAnim->setDuration(animationDuration);
-        employeIconAnim->setStartValue(ui->employe_icon->geometry());
-        QRect newEmployeIconRect = ui->employe_icon->geometry();
-        newEmployeIconRect.moveLeft(newEmployeIconRect.left() + iconSlideDistance);
-        employeIconAnim->setEndValue(newEmployeIconRect);
-        employeIconAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        employeIconAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *vehiculeIconAnim = new QPropertyAnimation(ui->vehicule_icon, "geometry");
-        vehiculeIconAnim->setDuration(animationDuration);
-        vehiculeIconAnim->setStartValue(ui->vehicule_icon->geometry());
-        QRect newVehiculeIconRect = ui->vehicule_icon->geometry();
-        newVehiculeIconRect.moveLeft(newVehiculeIconRect.left() + iconSlideDistance);
-        vehiculeIconAnim->setEndValue(newVehiculeIconRect);
-        vehiculeIconAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        vehiculeIconAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *tableAnim = new QPropertyAnimation(ui->tableWidget, "geometry");
-        tableAnim->setDuration(animationDuration);
-        tableAnim->setStartValue(ui->tableWidget->geometry());
-        QRect newTableRect = ui->tableWidget->geometry();
-        newTableRect.moveLeft(newTableRect.left() + slideDistance);
-        tableAnim->setEndValue(newTableRect);
-        tableAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        tableAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *btn2Anim = new QPropertyAnimation(ui->pushButton_2, "geometry");
-        btn2Anim->setDuration(animationDuration);
-        btn2Anim->setStartValue(ui->pushButton_2->geometry());
-        QRect newBtn2Rect = ui->pushButton_2->geometry();
-        newBtn2Rect.moveLeft(newBtn2Rect.left() + slideDistance);
-        btn2Anim->setEndValue(newBtn2Rect);
-        btn2Anim->setEasingCurve(QEasingCurve::InOutQuad);
-        btn2Anim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QPropertyAnimation *lineAnim = new QPropertyAnimation(ui->line, "geometry");
-        lineAnim->setDuration(animationDuration);
-        lineAnim->setStartValue(ui->line->geometry());
-        QRect newLineRect = ui->line->geometry();
-        newLineRect.moveLeft(newLineRect.left() + slideDistance + 40);
-        lineAnim->setEndValue(newLineRect);
-        lineAnim->setEasingCurve(QEasingCurve::InOutQuad);
-        lineAnim->start(QAbstractAnimation::DeleteWhenStopped);
-
-        QTimer::singleShot(animationDuration + 10, this, [this]() {
-            ui->pushButton_5->setVisible(true);
-            ui->pushButton_6->setVisible(true);
-            ui->pushButton_7->setVisible(true);
-            ui->pushButton_8->setVisible(true);
-            ui->pushButton_9->setVisible(true);
-        });
-
-        isCollapsed = false;
+        ui->pushButton_5->setVisible(true);
+        ui->pushButton_6->setVisible(true);
+        ui->pushButton_7->setVisible(true);
+        ui->pushButton_8->setVisible(true);
+        ui->pushButton_9->setVisible(true);
     }
+
+    isCollapsed = !isCollapsed;
 }
 
 //==============================================================================
-// DESTRUCTOR
+// NAVIGATION SLOTS
 //==============================================================================
-MainWindow::~MainWindow()
+
+void MainWindow::on_pushButton_5_clicked()
 {
-    delete ui;
+    // Cacher toutes les pages véhicule et missions
+    clearAllPages();
+
+    if (employePages) {
+        employePages->hide();
+    }
+    
+    if (poubellePages) {
+        poubellePages->hide();
+    }
+
+    // Afficher la page Zone
+    if (zonePages) {
+        zonePages->show();
+        zonePages->raise();
+    }
+
+    currentPage = PAGE_ZONES;
+}
+
+void MainWindow::on_pushButton_6_clicked()  // Poubelle
+{
+    if (zonePages) {
+        zonePages->hide();
+    }
+    if (employePages) {
+        employePages->hide();
+    }
+    if (poubellePages) {
+        poubellePages->show();
+    }
+    clearAllPages();
+    showPoubellePage();
+}
+
+void MainWindow::on_pushButton_7_clicked()  // Employe
+{
+    if (zonePages) {
+        zonePages->hide();
+    }
+    if (poubellePages) {
+        poubellePages->hide();
+    }
+    clearAllPages();
+    if (employePages) {
+        employePages->show();
+        employePages->raise();
+    }
+    currentPage = PAGE_EMPLOYE;
+}
+
+void MainWindow::on_pushButton_8_clicked()  // Missions
+{
+    if (zonePages) {
+        zonePages->hide();
+    }
+    if (employePages) {
+        employePages->hide();
+    }
+    if (poubellePages) {
+        poubellePages->hide();
+    }
+    clearAllPages();
+    showMissionsPage();
+}
+
+void MainWindow::on_pushButton_9_clicked()  // Vehicule
+{
+    if (zonePages) {
+        zonePages->hide();
+    }
+    if (employePages) {
+        employePages->hide();
+    }
+    if (poubellePages) {
+        poubellePages->hide();
+    }
+    clearAllPages();
+    showVehiculePage();
 }

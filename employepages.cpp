@@ -26,23 +26,23 @@ EmployePages::EmployePages(QWidget *parent)
     setStyleSheet(
         "QWidget#EmployePages { background-color: #F0F3F5; }"
         "QWidget#topButtonBar, QWidget#searchBar { background-color: transparent; }"
-        "QPushButton#btnListEmployees, QPushButton#btnAddEmployee, QPushButton#btnStatistics { min-height: 45px; }"
-        "QPushButton#btnEmail, QPushButton#btnFilter, QPushButton#btnGeneratePdf { background-color: #8e944e; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 10pt; font-weight: bold; }"
-        "QPushButton#btnConfirmAdd, QPushButton#btnConfirmUpdate { background-color: #8e944e; color: white; border: none; border-radius: 10px; padding: 12px 30px; font-size: 11pt; font-weight: bold; }"
-        "QPushButton#btnUploadImage { background-color: #05668D; color: white; border: none; border-radius: 10px; padding: 12px 16px; font-size: 10pt; font-weight: bold; }"
-        "QLineEdit, QComboBox { border: 2px solid #E0E0E0; border-radius: 8px; padding: 8px 12px; background-color: white; color: #2C3E50; }"
+        "QPushButton#btnListEmployees, QPushButton#btnAddEmployee, QPushButton#btnStatistics { min-height: 40px; }"
+        "QPushButton#btnEmail, QPushButton#btnFilter, QPushButton#btnGeneratePdf { background-color: #8e944e; color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 9pt; font-weight: bold; }"
+        "QPushButton#btnConfirmAdd, QPushButton#btnConfirmUpdate { background-color: #8e944e; color: white; border: none; border-radius: 8px; padding: 8px 20px; font-size: 10pt; font-weight: bold; }"
+        "QPushButton#btnUploadImage { background-color: #05668D; color: white; border: none; border-radius: 8px; padding: 8px 12px; font-size: 9pt; font-weight: bold; }"
+        "QLineEdit, QComboBox { border: 2px solid #E0E0E0; border-radius: 6px; padding: 6px 10px; background-color: white; color: #2C3E50; font-size: 10pt; }"
         "QLineEdit::placeholder { color: #7B8794; }"
         "QComboBox QAbstractItemView { background-color: white; color: #2C3E50; selection-background-color: rgba(142, 148, 78, 0.25); selection-color: #2C3E50; outline: none; }"
-        "QTextEdit#inputProgress { border: 2px solid #E0E0E0; border-radius: 8px; padding: 10px; background-color: white; }"
-        "QLabel { color: #2C3E50; font-size: 9.5pt; font-weight: 600; }"
-        "QLabel#formTitle { color: #8e944e; font-size: 18pt; font-weight: 800; }"
-        "QWidget#pageForm QLabel { margin-top: 6px; margin-bottom: 4px; }"
+        "QTextEdit#inputProgress { border: 2px solid #E0E0E0; border-radius: 6px; padding: 6px; background-color: white; font-size: 9pt; }"
+        "QLabel { color: #2C3E50; font-size: 9pt; font-weight: 600; }"
+        "QLabel#formTitle { color: #8e944e; font-size: 16pt; font-weight: 800; margin-bottom: 8px; }"
+        "QWidget#pageForm QLabel { margin-top: 4px; margin-bottom: 2px; }"
         "QTableWidget { background-color: white; alternate-background-color: #F7F8FA; border: 2px solid #E0E0E0; border-radius: 10px; gridline-color: #E0E0E0; font-size: 10pt; color: #2C3E50; }"
         "QTableWidget::viewport { background-color: white; }"
         "QTableWidget::item { padding: 10px; border-bottom: 1px solid #F0F0F0; }"
         "QTableWidget::item:selected { background-color: rgba(142, 148, 78, 0.22); color: #2C3E50; }"
         "QHeaderView::section { background-color: #8e944e; color: white; padding: 12px; border: none; font-weight: bold; font-size: 10pt; }"
-        "QWidget#formFieldsContainer { background-color: white; border: 2px solid #8e944e; border-radius: 15px; }"
+        "QWidget#formFieldsContainer { background-color: white; border: 2px solid #8e944e; border-radius: 12px; padding: 10px; }"
         "QWidget#statsLeftContainer, QWidget#statsRightContainer { background-color: white; border: 2px solid #E0E0E0; border-radius: 15px; }"
         );
 
@@ -52,12 +52,14 @@ EmployePages::EmployePages(QWidget *parent)
     }
     if (ui->formLayout) {
         ui->formLayout->setAlignment(Qt::AlignHCenter);
-        ui->formLayout->setSpacing(18);
-        ui->formLayout->setContentsMargins(0, 10, 0, 0);
+        ui->formLayout->setSpacing(8);  // Reduced from 18
+        ui->formLayout->setContentsMargins(0, 5, 0, 0);  // Reduced from 0, 10, 0, 0
     }
 
     if (ui->formGrid) {
-        ui->formGrid->setVerticalSpacing(18);
+        ui->formGrid->setVerticalSpacing(6);  // Reduced from 18
+        ui->formGrid->setHorizontalSpacing(15);  // Added horizontal spacing control
+        ui->formGrid->setContentsMargins(10, 10, 10, 10);  // Added margin control
     }
 
     if (ui->searchBox) {
@@ -74,11 +76,12 @@ EmployePages::EmployePages(QWidget *parent)
     if (ui->btnUploadImage) {
         ui->btnUploadImage->setToolTip("Upload an employee photo");
         ui->btnUploadImage->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        ui->btnUploadImage->setFixedHeight(44);
+        ui->btnUploadImage->setFixedHeight(36);  // Reduced from 44
     }
     if (ui->inputProgress) {
         ui->inputProgress->setToolTip("Add a short progress note");
-        ui->inputProgress->setMinimumHeight(120);
+        ui->inputProgress->setMinimumHeight(70);  // Reduced from 120
+        ui->inputProgress->setMaximumHeight(70);  // Limit maximum height
     }
 
     ui->sortCombo->addItems({"Nom", "Prénom", "ID", "Position"});
