@@ -17,6 +17,15 @@
 #include <QTextStream>
 #include <QPainter>
 #include <algorithm>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QChartView>
+#include <QPieSeries>
+#include <QPieSlice>
+#include <QBarSeries>
+#include <QBarSet>
+#include <QBarCategoryAxis>
+#include <QValueAxis>
 
 //==============================================================================
 // CONSTRUCTOR
@@ -138,9 +147,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     // ─── Missions connections ───────────────────────────────────────────────
     connect(ui->btnAddMission, &QPushButton::clicked, this, &MainWindow::onAddMissionClicked);
+    connect(ui->btnMissionStats, &QPushButton::clicked, this, &MainWindow::onMissionStatsClicked);
     connect(ui->btnSaveMission, &QPushButton::clicked, this, &MainWindow::onSaveMissionForm);
     connect(ui->btnCancelMission, &QPushButton::clicked, this, &MainWindow::onCancelMissionForm);
     connect(ui->btnCloseForm, &QPushButton::clicked, this, &MainWindow::onCloseMissionForm);
+    connect(ui->btnBackFromMissionStats, &QPushButton::clicked, this, [this](){ showMissionsPage(); });
 
     // Charger les données
     loadVehicules();
@@ -234,9 +245,9 @@ void MainWindow::loadMissions()
 {
     missions.clear();
 
-    missions.append(Mission(nextMissionId++, "2025-02-10", "07:30", "13:00", "Rue France", "1,4,6"));
-    missions.append(Mission(nextMissionId++, "2025-02-11", "08:00", "16:30", "Avenue Habib Bourguiba", "2,5"));
-    missions.append(Mission(nextMissionId++, "2025-02-12", "06:45", "14:15", "Lac 1", "3"));
+    missions.append(Mission(nextMissionId++, "2025-02-10", "07:30", "13:00", "Collecte secteur nord", 1, 2));
+    missions.append(Mission(nextMissionId++, "2025-02-11", "08:00", "16:30", "Nettoyage avenue principale", 2, 1));
+    missions.append(Mission(nextMissionId++, "2025-02-12", "06:45", "14:15", "Inspection zone lac", 3, 3));
 
     qDebug() << "Loaded" << missions.size() << "missions";
 }
@@ -255,6 +266,7 @@ void MainWindow::clearAllPages()
     ui->pageChatbot->setVisible(false);
     ui->pageMissions->setVisible(false);
     ui->pageAddMission->setVisible(false);
+    ui->pageMissionStats->setVisible(false);
     employePages->setVisible(false);
 
     ui->tableWidget->setRowCount(0);
@@ -302,101 +314,7 @@ void MainWindow::showMissionsPage()
     setupMissionsTableHeaders();
     refreshMissionsTable();
 
-    // === NEW COOL STATS + CHART + TRANSITION ===
-    ui->statsContainer->setVisible(false);   // start hidden
-
-    // Fade + scale animation
-    QPropertyAnimation *anim = new QPropertyAnimation(ui->statsContainer, "geometry");
-    anim->setDuration(700);
-    anim->setEasingCurve(QEasingCurve::OutCubic);
-
-    QRect startRect = ui->statsContainer->geometry();
-    startRect.setWidth(startRect.width() * 0.95);
-    startRect.setHeight(startRect.height() * 0.95);
-
-    anim->setStartValue(startRect);
-    anim->setEndValue(ui->statsContainer->geometry());
-
-    QPropertyAnimation *fade = new QPropertyAnimation(ui->statsContainer, "windowOpacity");
-    fade->setDuration(700);
-    fade->setStartValue(0.0);
-    fade->setEndValue(1.0);
-
-    anim->start(QAbstractAnimation::DeleteWhenStopped);
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
-
-    ui->statsContainer->setVisible(true);
-
-    // Draw the chart
-    drawMissionsChart();
-}
-void MainWindow::drawMissionsChart()
-{
-    // Example data - replace with your real stats
-    int total = missions.size();
-    int today = 0;
-    int planned = 0;
-    int ongoing = 0;
-    int completed = 0;
-
-    QDate todayDate = QDate::currentDate();
-    for (const auto& m : missions) {
-        QDate d = QDate::fromString(m.date(), "yyyy-MM-dd");
-        if (d == todayDate) today++;
-        // Add your real status logic here
-        if (m.statutZone().contains("Planifiée")) planned++;
-        else if (m.statutZone().contains("En cours")) ongoing++;
-        else completed++;
-    }
-
-    QPixmap pix(1010, 220);
-    pix.fill(Qt::transparent);
-    QPainter painter(&pix);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    // Background gradient
-    QLinearGradient bgGrad(0, 0, 0, 220);
-    bgGrad.setColorAt(0, QColor(40, 40, 70));
-    bgGrad.setColorAt(1, QColor(20, 20, 40));
-    painter.fillRect(pix.rect(), bgGrad);
-
-    // Draw simple bar chart
-    int barWidth = 180;
-    int spacing = 40;
-    int maxHeight = 160;
-    int baseY = 180;
-
-    struct Bar { QString label; int value; QColor color; };
-    QVector<Bar> bars = {
-        {"Total", total, QColor(100, 180, 255)},
-        {"Today", today, QColor(100, 255, 200)},
-        {"Planned", planned, QColor(255, 180, 100)},
-        {"Ongoing", ongoing, QColor(255, 120, 120)},
-        {"Completed", completed, QColor(120, 255, 120)}
-    };
-
-    int x = 50;
-    for (const auto& bar : bars) {
-        int h = (bar.value * maxHeight) / qMax(1, total); // scale
-        QLinearGradient grad(x, baseY - h, x, baseY);
-        grad.setColorAt(0, bar.color.lighter(120));
-        grad.setColorAt(1, bar.color);
-        painter.setBrush(grad);
-        painter.setPen(Qt::NoPen);
-        painter.drawRoundedRect(x, baseY - h, barWidth, h, 12, 12);
-
-        // Label value
-        painter.setPen(QColor(220, 220, 255));
-        painter.setFont(QFont("Arial", 12, QFont::Bold));
-        painter.drawText(QRect(x, baseY - h - 30, barWidth, 30), Qt::AlignCenter, QString::number(bar.value));
-
-        // Bottom label
-        painter.drawText(QRect(x, baseY + 10, barWidth, 30), Qt::AlignCenter, bar.label);
-
-        x += barWidth + spacing;
-    }
-
-    ui->lblMissionsChart->setPixmap(pix);
+   
 }
 
 
@@ -528,8 +446,9 @@ void MainWindow::showAddMissionPage()
     ui->calendarMission->setSelectedDate(QDate::currentDate());
     ui->timeEditDebut->setTime(QTime(8, 0));
     ui->timeEditFin->setTime(QTime(16, 0));
-    ui->lineEditZone->clear();
-    ui->lineEditEmployes->clear();
+    ui->lineEditDesc->clear();
+    ui->spinIdZone->setValue(0);
+    ui->spinIdVehicule->setValue(0);
 
     if (editingMissionId >= 0) {
         ui->lblMissionFormTitle->setText("Modifier la mission");
@@ -539,8 +458,9 @@ void MainWindow::showAddMissionPage()
                 ui->calendarMission->setSelectedDate(QDate::fromString(m.date(), "yyyy-MM-dd"));
                 ui->timeEditDebut->setTime(QTime::fromString(m.heureDebut(), "HH:mm"));
                 ui->timeEditFin->setTime(QTime::fromString(m.heureFin(), "HH:mm"));
-                ui->lineEditZone->setText(m.statutZone());
-                ui->lineEditEmployes->setText(m.listeEmployes());
+                ui->lineEditDesc->setText(m.descMission());
+                ui->spinIdZone->setValue(m.idZone());
+                ui->spinIdVehicule->setValue(m.idVehicule());
                 break;
             }
         }
@@ -555,22 +475,142 @@ void MainWindow::showAddMissionPage()
 //==============================================================================
 void MainWindow::setupMissionsTableHeaders()
 {
-    ui->tableMissions->setColumnCount(7);
-    ui->tableMissions->setHorizontalHeaderLabels({"ID", "Date", "Heure Début", "Heure Fin", "Zone", "Statut", "Employés", "Actions"});
+    ui->tableMissions->setColumnCount(8);
+    ui->tableMissions->setHorizontalHeaderLabels({
+        "ID", "Date", "Heure Début", "Heure Fin", "Description", "ID Zone", "ID Véhicule", "Opérations"
+    });
 
-    ui->tableMissions->setColumnWidth(0, 100);
-    ui->tableMissions->setColumnWidth(1, 150);
-    ui->tableMissions->setColumnWidth(2, 120);
-    ui->tableMissions->setColumnWidth(3, 120);
-    ui->tableMissions->setColumnWidth(4, 200);
-    ui->tableMissions->setColumnWidth(5, 180);
-    ui->tableMissions->setColumnWidth(6, 180);
+    ui->tableMissions->setColumnWidth(0, 60);
+    ui->tableMissions->setColumnWidth(1, 130);
+    ui->tableMissions->setColumnWidth(2, 110);
+    ui->tableMissions->setColumnWidth(3, 110);
+    ui->tableMissions->setColumnWidth(4, 250);
+    ui->tableMissions->setColumnWidth(5, 90);
+    ui->tableMissions->setColumnWidth(6, 110);
+    ui->tableMissions->setColumnWidth(7, 120);
 
     ui->tableMissions->setShowGrid(true);
     ui->tableMissions->verticalHeader()->setVisible(false);
     ui->tableMissions->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableMissions->setFocusPolicy(Qt::NoFocus);
     ui->tableMissions->setSelectionMode(QAbstractItemView::NoSelection);
+}
+void MainWindow::onMissionStatsClicked()
+{
+    showMissionStatsPage();
+}
+
+void MainWindow::showMissionStatsPage()
+{
+    clearAllPages();
+    currentPage = PAGE_MISSION_STATS;
+    ui->pageMissionStats->setVisible(true);
+    setupMissionCharts();
+}
+
+void MainWindow::setupMissionCharts()
+{
+    QWidget *leftContainer = ui->missionStatsLeftContainer;
+    QWidget *rightContainer = ui->missionStatsRightContainer;
+
+    if (!leftContainer || !rightContainer) return;
+
+    // Clear any existing layouts
+    if (leftContainer->layout()) {
+        QLayout *old = leftContainer->layout();
+        QLayoutItem *item;
+        while ((item = old->takeAt(0)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        delete old;
+    }
+    if (rightContainer->layout()) {
+        QLayout *old = rightContainer->layout();
+        QLayoutItem *item;
+        while ((item = old->takeAt(0)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        delete old;
+    }
+
+    // ── LEFT: Pie chart – Missions by status ──────────────────────────────
+    QVBoxLayout *leftLayout = new QVBoxLayout(leftContainer);
+    leftLayout->setContentsMargins(20, 20, 20, 20);
+
+    QLabel *pieTitle = new QLabel("Répartition des Missions par Statut");
+    pieTitle->setStyleSheet("font-size: 13pt; font-weight: bold; color: #2C3E50; background-color: transparent;");
+    pieTitle->setAlignment(Qt::AlignCenter);
+    leftLayout->addWidget(pieTitle);
+
+    QPieSeries *pieSeries = new QPieSeries();
+    pieSeries->append("Planifiée",  missions.size() > 0 ? 1 : 0);
+    pieSeries->append("En cours",   missions.size() > 1 ? 1 : 0);
+    pieSeries->append("Terminée",   missions.size() > 2 ? 1 : 0);
+    pieSeries->append("Annulée",    0);
+
+    // Count real statuses if you have them – for now uses proportional example
+    QList<QColor> colors = {QColor("#8e944e"), QColor("#05668D"), QColor("#02C39A"), QColor("#c0392b")};
+    for (int i = 0; i < pieSeries->slices().count(); i++) {
+        QPieSlice *slice = pieSeries->slices().at(i);
+        slice->setColor(colors[i % colors.size()]);
+        slice->setLabelVisible(true);
+        if (slice->percentage() > 0.25) {
+            slice->setExploded(true);
+            slice->setExplodeDistanceFactor(0.1);
+        }
+    }
+
+    QChart *pieChart = new QChart();
+    pieChart->addSeries(pieSeries);
+    pieChart->legend()->setAlignment(Qt::AlignBottom);
+    pieChart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QChartView *pieChartView = new QChartView(pieChart);
+    pieChartView->setRenderHint(QPainter::Antialiasing);
+    pieChartView->setMinimumHeight(400);
+    leftLayout->addWidget(pieChartView);
+
+    // ── RIGHT: Bar chart – Missions per month ────────────────────────────
+    QVBoxLayout *rightLayout = new QVBoxLayout(rightContainer);
+    rightLayout->setContentsMargins(20, 20, 20, 20);
+
+    QLabel *barTitle = new QLabel("Nombre de Missions par Mois");
+    barTitle->setStyleSheet("font-size: 13pt; font-weight: bold; color: #2C3E50; background-color: transparent;");
+    barTitle->setAlignment(Qt::AlignCenter);
+    rightLayout->addWidget(barTitle);
+
+    QBarSet *missionSet = new QBarSet("Missions");
+    *missionSet << 3 << 5 << 2 << 7 << 4 << 6;   // replace with real monthly counts
+    missionSet->setColor(QColor("#8e944e"));
+
+    QBarSeries *barSeries = new QBarSeries();
+    barSeries->append(missionSet);
+
+    QChart *barChart = new QChart();
+    barChart->addSeries(barSeries);
+    barChart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QStringList months;
+    months << "Sep" << "Oct" << "Nov" << "Déc" << "Jan" << "Fév";
+
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(months);
+    barChart->addAxis(axisX, Qt::AlignBottom);
+    barSeries->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setRange(0, 10);
+    barChart->addAxis(axisY, Qt::AlignLeft);
+    barSeries->attachAxis(axisY);
+
+    barChart->legend()->setAlignment(Qt::AlignTop);
+
+    QChartView *barChartView = new QChartView(barChart);
+    barChartView->setRenderHint(QPainter::Antialiasing);
+    barChartView->setMinimumHeight(400);
+    rightLayout->addWidget(barChartView);
 }
 
 void MainWindow::refreshMissionsTable()
@@ -589,8 +629,9 @@ void MainWindow::on_btnSearchMission_clicked()
     for (const auto& m : missions) {
         if (text.isEmpty() ||
             m.date().toLower().contains(text) ||
-            m.statutZone().toLower().contains(text) ||
-            m.listeEmployes().toLower().contains(text)) {
+            m.descMission().toLower().contains(text) ||
+            QString::number(m.idZone()).contains(text) ||
+            QString::number(m.idVehicule()).contains(text)) {
             addMissionRowWithButtons(row++, m);
         }
     }
@@ -604,11 +645,12 @@ void MainWindow::addMissionRowWithButtons(int row, const Mission& mission)
     ui->tableMissions->setItem(row, 1, new QTableWidgetItem(mission.date()));
     ui->tableMissions->setItem(row, 2, new QTableWidgetItem(mission.heureDebut()));
     ui->tableMissions->setItem(row, 3, new QTableWidgetItem(mission.heureFin()));
-    ui->tableMissions->setItem(row, 4, new QTableWidgetItem(mission.statutZone()));     // now Zone
-    ui->tableMissions->setItem(row, 5, new QTableWidgetItem("Planifiée"));              // TEMP: hardcode Statut for now
-    ui->tableMissions->setItem(row, 6, new QTableWidgetItem(mission.listeEmployes()));
+    ui->tableMissions->setItem(row, 4, new QTableWidgetItem(mission.descMission()));
+    ui->tableMissions->setItem(row, 5, new QTableWidgetItem(QString::number(mission.idZone())));
+    ui->tableMissions->setItem(row, 6, new QTableWidgetItem(QString::number(mission.idVehicule())));
 
     QWidget *buttonWidget = new QWidget();
+    buttonWidget->setStyleSheet("background-color: transparent;");
     QHBoxLayout *layout = new QHBoxLayout(buttonWidget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(10);
@@ -622,6 +664,8 @@ void MainWindow::addMissionRowWithButtons(int row, const Mission& mission)
     btnUpdate->setIconSize(buttonSize);
     btnUpdate->setFixedSize(buttonSize);
     btnUpdate->setFlat(true);
+    btnUpdate->setStyleSheet("QPushButton { background: transparent; border: none; }");
+    btnUpdate->setCursor(Qt::PointingHandCursor);
     btnUpdate->setProperty("missionId", mission.id());
     connect(btnUpdate, &QPushButton::clicked, this, &MainWindow::onUpdateMissionClicked);
 
@@ -631,13 +675,15 @@ void MainWindow::addMissionRowWithButtons(int row, const Mission& mission)
     btnDelete->setIconSize(buttonSize);
     btnDelete->setFixedSize(buttonSize);
     btnDelete->setFlat(true);
+    btnDelete->setStyleSheet("QPushButton { background: transparent; border: none; }");
+    btnDelete->setCursor(Qt::PointingHandCursor);
     btnDelete->setProperty("missionId", mission.id());
     connect(btnDelete, &QPushButton::clicked, this, &MainWindow::onDeleteMissionClicked);
 
     layout->addWidget(btnUpdate);
     layout->addWidget(btnDelete);
 
-    ui->tableMissions->setCellWidget(row, 6, buttonWidget);
+    ui->tableMissions->setCellWidget(row, 7, buttonWidget);
 }
 
 //==============================================================================
@@ -652,14 +698,13 @@ void MainWindow::onAddMissionClicked()
 {
     editingMissionId = -1;
 
-    // Reset form for new mission
     ui->calendarMission->setSelectedDate(QDate::currentDate());
     ui->timeEditDebut->setTime(QTime(8, 0));
-    ui->timeEditFin->setTime(QTime(9, 0)); // default +1h
-    ui->lineEditZone->clear();
-    ui->lineEditEmployes->clear();
+    ui->timeEditFin->setTime(QTime(9, 0));
+    ui->lineEditDesc->clear();
+    ui->spinIdZone->setValue(0);
+    ui->spinIdVehicule->setValue(0);
 
-    // Update title
     ui->lblMissionFormTitle->setText("Ajouter une Mission");
 
     // Show form, hide list
@@ -680,8 +725,9 @@ void MainWindow::onUpdateMissionClicked()
             ui->calendarMission->setSelectedDate(QDate::fromString(m.date(), "yyyy-MM-dd"));
             ui->timeEditDebut->setTime(QTime::fromString(m.heureDebut(), "HH:mm"));
             ui->timeEditFin->setTime(QTime::fromString(m.heureFin(), "HH:mm"));
-            ui->lineEditZone->setText(m.statutZone());
-            ui->lineEditEmployes->setText(m.listeEmployes());
+            ui->lineEditDesc->setText(m.descMission());
+            ui->spinIdZone->setValue(m.idZone());
+            ui->spinIdVehicule->setValue(m.idVehicule());
             break;
         }
     }
@@ -724,35 +770,38 @@ void MainWindow::onSaveMissionForm()
     QString date = ui->calendarMission->selectedDate().toString("yyyy-MM-dd");
     QString heureDebut = ui->timeEditDebut->time().toString("HH:mm");
     QString heureFin = ui->timeEditFin->time().toString("HH:mm");
-    QString zone = ui->lineEditZone->text().trimmed();
-    QString employes = ui->lineEditEmployes->text().trimmed();
+    QString desc = ui->lineEditDesc->text().trimmed();
+    int idZone = ui->spinIdZone->value();
+    int idVehicule = ui->spinIdVehicule->value();
 
-    if (zone.isEmpty() || employes.isEmpty()) {
-        QMessageBox::warning(this, "Erreur", "Veuillez remplir la zone et les employés.");
+    if (desc.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez remplir la description.");
         return;
     }
-
+    if (idZone <= 0 || idVehicule <= 0) {
+        QMessageBox::warning(this, "Erreur", "ID Zone et ID Véhicule doivent être supérieurs à 0.");
+        return;
+    }
     if (ui->timeEditDebut->time() >= ui->timeEditFin->time()) {
         QMessageBox::warning(this, "Erreur", "L'heure de fin doit être après l'heure de début.");
         return;
     }
 
     if (editingMissionId >= 0) {
-        // Update existing mission
         for (auto &m : missions) {
             if (m.id() == editingMissionId) {
                 m.setDate(date);
                 m.setHeureDebut(heureDebut);
                 m.setHeureFin(heureFin);
-                m.setStatutZone(zone);
-                m.setListeEmployes(employes);
+                m.setDescMission(desc);
+                m.setIdZone(idZone);
+                m.setIdVehicule(idVehicule);
                 break;
             }
         }
         QMessageBox::information(this, "Succès", "Mission modifiée avec succès.");
     } else {
-        // Add new mission
-        missions.append(Mission(nextMissionId++, date, heureDebut, heureFin, zone, employes));
+        missions.append(Mission(nextMissionId++, date, heureDebut, heureFin, desc, idZone, idVehicule));
         QMessageBox::information(this, "Succès", "Mission ajoutée avec succès.");
     }
 
@@ -784,20 +833,24 @@ void MainWindow::on_btnEstimerFin_clicked()
 
     QTime fin = debut.addSecs(3600); // +1 heure
 
-    // Create non-modal popup for "Estimation en cours..."
-    QMessageBox *waitMsg = new QMessageBox(this);
-    waitMsg->setIcon(QMessageBox::Information);
-    waitMsg->setWindowTitle("Estimation");
-    waitMsg->setText("Estimation en cours...");
-    waitMsg->setStandardButtons(QMessageBox::NoButton);
-    waitMsg->setAttribute(Qt::WA_DeleteOnClose); // auto-delete when closed
-    waitMsg->setModal(false);
-    waitMsg->show();
+    // Non-modal loading dialog
+    QDialog *waitDlg = new QDialog(this, Qt::Tool | Qt::FramelessWindowHint);
+    waitDlg->setAttribute(Qt::WA_DeleteOnClose);
+    waitDlg->setFixedSize(300, 80);
+    waitDlg->setStyleSheet("background-color: #8e944e; border-radius: 10px;");
 
-    // Timer to simulate delay and set the time
-    QTimer::singleShot(1500, this, [=]() mutable {
+    QLabel *lblWait = new QLabel("⏱ Estimation en cours...", waitDlg);
+    lblWait->setAlignment(Qt::AlignCenter);
+    lblWait->setStyleSheet("color: white; font-size: 13pt; font-weight: bold;");
+    lblWait->setGeometry(0, 0, 300, 80);
+
+    waitDlg->setWindowModality(Qt::NonModal);
+    waitDlg->show();
+
+    // Timer to simulate delay, then set result and close dialog
+    QTimer::singleShot(1500, this, [=]() {
         ui->timeEditFin->setTime(fin);
-        waitMsg->close(); // close the popup
+        waitDlg->close();
         QMessageBox::information(this, "Estimation terminée",
                                  "Heure de fin estimée : " + fin.toString("HH:mm"));
     });
