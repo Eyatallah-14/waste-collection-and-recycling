@@ -59,30 +59,35 @@ class Mission
 {
 public:
     Mission(int id = 0, const QString& date = "", const QString& heureDebut = "",
-            const QString& heureFin = "", const QString& statutZone = "", const QString& listeEmployes = "")
+            const QString& heureFin = "", const QString& descMission = "",
+            int idZone = 0, int idVehicule = 0)
         : m_id(id), m_date(date), m_heureDebut(heureDebut),
-          m_heureFin(heureFin), m_statutZone(statutZone), m_listeEmployes(listeEmployes) {}
+          m_heureFin(heureFin), m_descMission(descMission),
+          m_idZone(idZone), m_idVehicule(idVehicule) {}
 
     int id() const { return m_id; }
     QString date() const { return m_date; }
     QString heureDebut() const { return m_heureDebut; }
     QString heureFin() const { return m_heureFin; }
-    QString statutZone() const { return m_statutZone; }
-    QString listeEmployes() const { return m_listeEmployes; }
+    QString descMission() const { return m_descMission; }
+    int idZone() const { return m_idZone; }
+    int idVehicule() const { return m_idVehicule; }
 
     void setDate(const QString& date) { m_date = date; }
-    void setHeureDebut(const QString& heureDebut) { m_heureDebut = heureDebut; }
-    void setHeureFin(const QString& heureFin) { m_heureFin = heureFin; }
-    void setStatutZone(const QString& statutZone) { m_statutZone = statutZone; }
-    void setListeEmployes(const QString& listeEmployes) { m_listeEmployes = listeEmployes; }
+    void setHeureDebut(const QString& h) { m_heureDebut = h; }
+    void setHeureFin(const QString& h) { m_heureFin = h; }
+    void setDescMission(const QString& d) { m_descMission = d; }
+    void setIdZone(int id) { m_idZone = id; }
+    void setIdVehicule(int id) { m_idVehicule = id; }
 
 private:
     int m_id;
     QString m_date;
     QString m_heureDebut;
     QString m_heureFin;
-    QString m_statutZone;
-    QString m_listeEmployes;
+    QString m_descMission;
+    int m_idZone;
+    int m_idVehicule;
 };
 
 //==============================================================================
@@ -195,7 +200,7 @@ private slots:
     void on_btnSearchMission_clicked();
     void on_btnApplySortGroup_clicked();
     void on_btnEstimerFin_clicked();
-    void drawMissionsChart();
+    void onMissionStatsClicked();
    
 
 private:
@@ -240,7 +245,8 @@ private:
         PAGE_SORT,
         PAGE_STATS,
         PAGE_CHATBOT,
-        PAGE_ADD_MISSION
+        PAGE_ADD_MISSION,
+        PAGE_MISSION_STATS
     };
 
     PageType currentPage;
@@ -269,6 +275,8 @@ private:
     void showStatsPage();
     void showChatbotPage();
     void showAddMissionPage();
+    void showMissionStatsPage();
+    void setupMissionCharts();
 
     // Chart related
     void drawStatsChart();
