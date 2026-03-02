@@ -2,25 +2,14 @@
 #define GESTIONPOUBELLEPAGES_H
 
 #include <QWidget>
-#include <QMap>
+#include <QSqlQueryModel>
+#include <QList>
+#include <QStringList>
+#include "poubelle.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class GestionPoubellePage;
-}
+namespace Ui { class GestionPoubellePage; }
 QT_END_NAMESPACE
-
-struct Poubelle {
-    int id;
-    QString type_dechet;
-    QString etat;
-    int taux_remplissage;
-    QString localisation;
-    QString date_installation;
-    QString derniere_collecte;
-    bool endommagee;
-    QString notes;
-};
 
 class GestionPoubellePage : public QWidget
 {
@@ -47,17 +36,17 @@ private slots:
 
 private:
     Ui::GestionPoubellePage *ui;
-    QMap<int, Poubelle> poubelles;
-    int nextId;
+    Poubelle Ptmp;
+    int currentEditId = -1;
+    QList<QStringList> historique;
 
     void setupPoubelleTable();
     void setupCharts();
     void rafraichirTable();
-    void ajouterLigneTable(const Poubelle &p, int row);
+    void remplirTableDepuisModel(QSqlQueryModel *model);
     void viderFormulaire();
-    void remplirFormulaire(const Poubelle &p);
-    void verifierEtatPoubelle(const Poubelle &p);
-    void sauvegarderHistorique(const QString &action, const Poubelle &p);
+    void sauvegarderHistorique(const QString &action, int id,
+                                const QString &type, const QString &zone);
 };
 
 #endif // GESTIONPOUBELLEPAGES_H

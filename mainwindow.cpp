@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include <QResizeEvent>
 #include "./ui_mainwindow.h"
 #include "employepages.h"
 #include "zonepages.h"
@@ -151,17 +152,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Initialize employee pages widget
     employePages = new EmployePages(this);
-    employePages->setGeometry(230, 0, 1170, 850);  // Same position as vehicle pages
+    employePages->setGeometry(230, 0, this->width()-230, this->height()-30);
     employePages->setVisible(false);
 
     // Initialize zone pages widget
     zonePages = new ZonePages(this);
-    zonePages->setGeometry(230, 0, 1170, 850);  // Same position as other pages
+    zonePages->setGeometry(230, 0, this->width()-230, this->height()-30);
     zonePages->setVisible(false);
 
     // Initialize poubelle pages widget
     poubellePages = new GestionPoubellePage(this);
-    poubellePages->setGeometry(230, 0, 1170, 850);  // Same position as other pages
+    poubellePages->setGeometry(230, 0, this->width()-230, this->height()-30);
     poubellePages->setVisible(false);
     zonePages->hide();
 
@@ -1362,4 +1363,15 @@ void MainWindow::on_pushButton_9_clicked()  // Vehicule
     }
     clearAllPages();
     showVehiculePage();
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+    int sidebarW = 230;
+    int w = this->width() - sidebarW;
+    int h = this->height();
+    if (employePages)  employePages->setGeometry(sidebarW, 0, w, h);
+    if (zonePages)     zonePages->setGeometry(sidebarW, 0, w, h);
+    if (poubellePages) poubellePages->setGeometry(sidebarW, 0, w, h);
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1400</width>
-    <height>850</height>
+    <width>1100</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,7 +45,7 @@
       <x>220</x>
       <y>-130</y>
       <width>4</width>
-      <height>1100</height>
+      <height>700</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -368,8 +368,8 @@ QPushButton:pressed {
      <rect>
       <x>230</x>
       <y>0</y>
-      <width>1170</width>
-      <height>850</height>
+      <width>1050</width>
+      <height>700</height>
      </rect>
     </property>
     <property name="visible">
@@ -608,8 +608,8 @@ QPushButton:pressed {
      <rect>
       <x>230</x>
       <y>0</y>
-      <width>1170</width>
-      <height>850</height>
+      <width>1050</width>
+      <height>700</height>
      </rect>
     </property>
     <property name="visible">
@@ -778,8 +778,8 @@ QPushButton:pressed {
      <rect>
       <x>230</x>
       <y>0</y>
-      <width>1170</width>
-      <height>850</height>
+      <width>1050</width>
+      <height>700</height>
      </rect>
     </property>
     <property name="visible">
@@ -945,8 +945,8 @@ QPushButton:pressed {
      <rect>
       <x>230</x>
       <y>0</y>
-      <width>1170</width>
-      <height>850</height>
+      <width>1050</width>
+      <height>700</height>
      </rect>
     </property>
     <property name="visible">
@@ -1249,8 +1249,8 @@ QPushButton:pressed {
      <rect>
       <x>230</x>
       <y>0</y>
-      <width>1170</width>
-      <height>850</height>
+      <width>1050</width>
+      <height>700</height>
      </rect>
     </property>
     <property name="visible">
@@ -1368,8 +1368,8 @@ QPushButton:pressed {
      <rect>
       <x>230</x>
       <y>0</y>
-      <width>1170</width>
-      <height>850</height>
+      <width>1050</width>
+      <height>700</height>
      </rect>
     </property>
     <property name="visible">
@@ -1570,8 +1570,8 @@ QPushButton:pressed {
      <rect>
       <x>230</x>
       <y>0</y>
-      <width>1170</width>
-      <height>850</height>
+      <width>1050</width>
+      <height>700</height>
      </rect>
     </property>
     <property name="visible">
@@ -1678,8 +1678,8 @@ QHeaderView::section {
      <rect>
       <x>230</x>
       <y>0</y>
-      <width>1170</width>
-      <height>850</height>
+      <width>1050</width>
+      <height>700</height>
      </rect>
     </property>
     <property name="visible">
@@ -1984,7 +1984,7 @@ QPushButton:pressed {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1400</width>
+     <width>1100</width>
      <height>26</height>
     </rect>
    </property>
